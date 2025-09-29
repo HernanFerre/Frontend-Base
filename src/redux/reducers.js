@@ -6,6 +6,8 @@ import { reducer as routingReducer } from "./routing/reducer";
 import { reducer as apiReducer } from "./api/reducer";
 import { reducer as autorizacionReducer } from "./autorizacion/reducer";
 import { reducer as miPerfilReducer } from "./miPerfil/reducer";
+import { reducer as actividadesReducer } from "./actividad/reducer";
+import { reducer as artReducer } from "./art/reducer";
 
 export const rootReducer = (state = {}, action) => {
     const presentacionesEstadosRed = state.presentacionesEstados;
@@ -16,5 +18,7 @@ export const rootReducer = (state = {}, action) => {
         screen: screenReducer(state.screen, action),
         routing: routingReducer(state.routing, action),
         miPerfil: miPerfilReducer(state.miPerfil, action),
+        actividad: actividadesReducer(state.actividad, action),
+        art: artReducer(state.art, action),
     };
 };
