@@ -3,17 +3,20 @@
 import { html, LitElement, css } from "lit";
 import { store } from "../../redux/store";
 import { connect } from "@brunomon/helpers/connect";
-import { getByDescription, getById } from "../../redux/art/actions";
+import { getArt, getByDescription, getById, updateArt } from "../../redux/art/actions";
 
 const ART_BY_ID = "art.byId.timeStamp";
 const ART_BY_DESCRIPTION = "art.byDescription.timeStamp";
+const ART_ALL = "art.all.timeStamp";
+const ART_UPDATE = "art.updateArt.timeStamp"
 
-export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION)(LitElement) {
+export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
         this.item = {};
         this.itemByDescription = {};
+        this.items = []
     }
     static get styles() {
         return css`
@@ -23,9 +26,11 @@ export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION)(
         `;
     }
     render() { // TAREA - ARMAR UNA GRID QUE MUESTRE LOS RESULTADOS
-        return html`            
+        return html`     
+
             <div>Mi Componente</div> 
-            <button @click="${() => store.dispatch(getById("fb630bcd-0c63-4938-8541-e646961bf4ed"))}">Buscar por ID</button>
+            <button @click="${this.buscarPorId}">Buscar por ID</button>
+            <input id="buscarId"/>
             <div>${this.item.descripcion}</div>
             <div>${this.item.id}</div>
 
@@ -36,8 +41,36 @@ export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION)(
                 <div>${this.itemByDescription.descripcion}</div>
                 <div>${this.itemByDescription.id}</div>
             </div>
+
+            <div>
+                <button @click = "${this.modificar}">Modificar</button>
+            </div>
+
+            <div>
+                <label>ART Buscar TODOS</label>                
+                <button @click ="${this.buscarTodos}">Buscar  Todos</button>
+
+            </div>
+
+            ${this.items?.map(
+            (art) => html`
+                <div>${art.descripcion}</div>
+                <div>${art.id}</div>
+              `
+        )}
             
         `;
+    }
+
+    modificar() {
+        let id = this.shadowRoot.querySelector("#buscarId").value;
+        let descripcion = this.shadowRoot.querySelector("#descripcion").value;
+        let body = {
+            id: id,
+            descripcion: descripcion
+        }
+        store.dispatch(updateArt(body))
+
     }
 
     buscar() {
@@ -45,16 +78,32 @@ export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION)(
         store.dispatch(getByDescription(descripcion))
     }
 
+    buscarTodos() {
+        store.dispatch(getArt())
+    }
+
+    buscarPorId() {
+        let id = this.shadowRoot.querySelector("#buscarId").value;
+        store.dispatch(getById(id))
+
+    }
+
     stateChanged(state, name) {
         if (name == ART_BY_ID) {
             this.item = state.art.entity;
         }
-        if (name == ART_BY_DESCRIPTION) { 
+        if (name == ART_BY_DESCRIPTION) {
             this.itemByDescription = state.art.byDescription.entityByDescription[0];
         }
-           
+        if (name == ART_ALL) {
+            this.items = state.art.entities;
+        }
+        if (name == ART_UPDATE) {
+            this.buscarTodos()
+        }
+
     }
-    
+
     static get properties() {
         return {
             hidden: {
@@ -66,8 +115,11 @@ export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION)(
             },
             itemByDescription: {
                 type: Object,
+            },
+            items: {
+                type: Array,
             }
-    
+
         };
     }
 }
