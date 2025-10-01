@@ -331,7 +331,7 @@ export class menuPrincipal extends connect(store, MEDIA_CHANGE, SCREEN, SELECTIO
 
     firstUpdated(changedProperties) {
         this.opciones = this.shadowRoot.querySelector("#opciones");
-        this.abrir();
+        /* this.abrir(); */
     }
 
     stateChanged(state, name) {

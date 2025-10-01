@@ -11,6 +11,7 @@ import { menuPrincipal } from "./headers/menu";
 import { spinner } from "@brunomon/template-lit/src/views/css/spinner";
 import { gridLayout } from "@brunomon/template-lit/src/views/css/gridLayout";
 import { MiComponente } from "./componentes/miComponente";
+import { MisActividades} from "./componentes/misActividades"
 
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
@@ -60,7 +61,8 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
             <div class="spinner" anillo fixed hidden></div>
             <menu-principal area="header"></menu-principal>
             <!-- <form-test area="body"></form-test>  Eliminar para que se borren los botones -->
-             <mi-componente></mi-componente>
+             <!-- <mi-componente></mi-componente> -->
+            <mis-actividades></mis-actividades>
         `;
     }
 

@@ -14,9 +14,6 @@ import { AlertControl } from "./alert";
 import { ConfirmControl } from "./confirm";
 import { showAlert, showConfirm } from "../../redux/ui/actions";
 import { showSpinner } from "../../redux/api/actions";
-import { getActividades } from "../../redux/actividad/actions";
-import { getArt, getByDescription, getById, updateArt } from "../../redux/art/actions";
-import { addArt } from "../../redux/art/actions";
 
 export class formTest extends connect(store)(LitElement) {
     constructor() {
@@ -67,38 +64,26 @@ export class formTest extends connect(store)(LitElement) {
     render() {
         return html`
             <div class="inner-grid fit18">
-                <div class="input" >
-                    <input id="3" @blur = "${(e) => store.dispatch(addArt({ descripcion: e.currentTarget.value }))}" />
-                    <label for="3">AGREGAR ART</label>
-                    <label error>No puede ser vacio</label>
-                    <label subtext>Requerido</label>
-                </div>
-                <div class="input" >
-                    <input id="4" @blur = "${(e) => store.dispatch(updateArt({ id: "fb630bcd-0c63-4938-8541-e646961bf4ed", descripcion: e.currentTarget.value }))}" />
-                    <label for="4">UPDATE ART</label>
-                    <label error>No puede ser vacio</label>
-                    <label subtext>Requerido</label>
-                </div>
                 <div class="input">
-                    <input id="1" @blur = "${(e)=>store.dispatch(getByDescription(e.currentTarget.value))}" />
-                    <label for="1">Busqueda por Descripcion</label>
+                    <input id="1" />
+                    <label for="1">Input</label>
                     <label error>No puede ser vacio</label>
                     <label subtext>Requerido</label>
                 </div>
-                
-                <div class="input">
-                    <input id="2" @blur = "${(e)=>store.dispatch(getById(e.currentTarget.value))}" />
-                    <label for="2">Id</label>
+                <div class="input" disabled>
+                    <input id="2" disabled value="valor" />
+                    <label for="2">Disabled</label>
                     <label error>No puede ser vacio</label>
                     <label subtext>Requerido</label>
                 </div>
-
-                <div class="inner-grid column">
-                    <button flat @click = "${()=>store.dispatch(getActividades())}">AGREGAR</button>                    
+                <div class="input" error>
+                    <input id="3" />
+                    <label for="3">Con Error</label>
+                    <label error>No puede ser vacio</label>
+                    <label subtext>Requerido</label>
                 </div>
             </div>
-                
-            <!-- <div class="inner-grid fit18">
+            <div class="inner-grid fit18">
                 <div class="select">
                     <select id="pais" required>
                         <option value="" disabled selected>Selecciona una opción</option>
@@ -133,8 +118,8 @@ export class formTest extends connect(store)(LitElement) {
                     <label for="pais3">Con Error</label>
                     <label error>No puede ser vacio</label>
                 </div>
-            </div> -->
-            <!-- <div class="inner-grid fit18">
+            </div>
+            <div class="inner-grid fit18">
                 <div class="check">
                     <input id="c1" type="checkbox" />
                     <label for="c1">Check</label>
@@ -150,7 +135,7 @@ export class formTest extends connect(store)(LitElement) {
                     <label for="c2">Action</label>
                     <label></label>
                 </div>
-            </div> -->
+            </div>
 
             <div class="grid fit18">
                 <div class="inner-grid">
@@ -184,8 +169,8 @@ export class formTest extends connect(store)(LitElement) {
                     </div>
                 </div>
                 <div class="inner-grid">
-                    <button flat @click = "${()=>store.dispatch(getActividades())}">ACTIVIDADES</button>
-                    <button flat action @click = "${()=>store.dispatch(getArt())}">ART</button>
+                    <button flat>FLAT</button>
+                    <button flat action>FLAT ACTION</button>
                     <button flat disabled>FLAT DISBALED</button>
                     <button flat round>FLAT ROUND</button>
                     <div class="inner-grid column">
@@ -195,8 +180,6 @@ export class formTest extends connect(store)(LitElement) {
                         <button flat circle action big>${PERSON}</button>
                     </div>
                 </div>
-                                </div>
-
                 <div class="inner-grid">
                     <button link>LINK</button>
                     <button link action>LINK ACTION</button>
