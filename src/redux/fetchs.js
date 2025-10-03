@@ -19,5 +19,6 @@ export const artByDescriptionFetch = fetchFactory(webApi, "Art/GetByDescripcion"
 export const artByIdFetch = fetchFactory(webApi, "Art/GetById");
 export const addArtFetch = fetchFactory(webApi, "Art/Add");
 export const updateArtFetch = fetchFactory(webApi, "Art/Update");
-export const actByDescriptionFetch = fetchFactory(webApi, "Actividad/GetByDescripcion");
 export const actividadesFetch = fetchFactory(webApi, "Actividad/All");
+export const actByDescriptionFetch = fetchFactory(webApi, "Actividad/GetByDescripcion");
+export const actByIdFetch = fetchFactory(webApi, "Actividad/GetById");

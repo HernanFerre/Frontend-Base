@@ -8,11 +8,11 @@ import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
-import { getActividades, getByDescription } from "../../redux/actividad/actions";
-
+import { getActividades, getByDescription, getById } from "../../redux/actividad/actions";
 
 const ACTIVIDADES_ALL = "actividad.all.timeStamp"
 const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp"
+const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp"
 
 export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION)(LitElement) {
     constructor() {
@@ -23,9 +23,8 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
         this.items = []
     }
 
-
-static get styles() {
-    return css`
+    static get styles() {
+        return css`
         ${gridLayout}
         ${input}
         ${select}
@@ -93,10 +92,22 @@ static get styles() {
         `;
     }
 
-
-
-    render() { 
+    render() {
         return html`
+            <!-- Buscar por ID -->
+            <div class="inner-grid fit18">
+                <div class="input" style="grid-column: 1 / 9">
+                    <input id="buscarId"/>
+                        <label for="buscarId">ID</label>
+                        <label subtext>Ingresá un ID para buscar</label>
+                    <div>${this.item.descripcion}</div>
+                    <div>${this.item.id}</div>
+                </div>
+                <button raised action
+                style="grid-column: 2 / 8; align-self: center"
+                @click="${this.buscarPorId}">Buscar por ID</button>
+            </div>
+
             <!-- Buscar por Descripcion -->
             <div class="inner-grid fit18">
                 <label style="grid-column: 1 / 4; align-self: center">Buscar por Descripcion</label>
@@ -120,21 +131,18 @@ static get styles() {
                 <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
             </div>
 
-
             ${this.items?.map(
             (actividad) => html`
                 <div>${actividad.descripcion}</div>
                 <div>${actividad.id}</div>
               `
-                
-            )}
 
-            
+        )}
+
         `;
     }
 
     modificar() {
-
 
     }
 
@@ -148,8 +156,8 @@ static get styles() {
     }
 
     buscarPorId() {
-
-
+        let id = this.shadowRoot.querySelector("#buscarId").value;
+        store.dispatch(getById(id))
     }
 
     stateChanged(state, name) {
@@ -158,6 +166,9 @@ static get styles() {
         }
         if (name == ACTIVIDADES_BY_DESCRIPTION) {
             this.itemByDescription = state.actividad.byDescription.entityByDescription[0];
+        }
+        if (name == ACTIVIDADES_BY_ID) {
+            this.item = state.actividad.entity;
         }
     }
 

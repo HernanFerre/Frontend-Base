@@ -8,9 +8,9 @@ import {
     GET_BY_ID_ERROR,
     GET_BY_ID_SUCCESS,
     ADD_ART_ERROR,
-    ADD_ART_SUCCESS, 
+    ADD_ART_SUCCESS,
     UPDATE_ART_ERROR,
-    UPDATE_ART_SUCCESS,  
+    UPDATE_ART_SUCCESS,
 } from "./actions";
 
 const initialState = {
@@ -58,10 +58,10 @@ export const reducer = (state = initialState, action) => {
         case GET_BY_DESCRIPTION_SUCCESS:
             newState.byDescription.timeStamp = new Date().getTime();
             newState.byDescription.entityByDescription = action.payload.receive;
-            break;  
+            break;
         case GET_BY_DESCRIPTION_ERROR:
             newState.byDescription.timeStampError = new Date().getTime();
-            
+
             break;
         case GET_BY_ID_SUCCESS:
             newState.byId.timeStamp = new Date().getTime();
@@ -73,7 +73,7 @@ export const reducer = (state = initialState, action) => {
             break;
         case ADD_ART_SUCCESS:
             newState.addArt.timeStamp = new Date().getTime();
-            newState.addId = action.payload.receive;             
+            newState.addArt.addId = action.payload.receive;
             break;
         case ADD_ART_ERROR:
             newState.addArt.timeStampError = new Date().getTime();
@@ -81,10 +81,10 @@ export const reducer = (state = initialState, action) => {
             break;
         case UPDATE_ART_SUCCESS:
             newState.updateArt.timeStamp = new Date().getTime();
-            newState.resultado = action.payload.receive;             
+            newState.resultado = action.payload.receive;
             break;
         case UPDATE_ART_ERROR:
-            newState.updateArt.timeStampError = new Date().getTime();   
+            newState.updateArt.timeStampError = new Date().getTime();
             break;
     }
     return newState;
