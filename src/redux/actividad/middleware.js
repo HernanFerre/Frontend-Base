@@ -1,7 +1,7 @@
 /** @format */
 
-import { actByDescriptionFetch, actByIdFetch, actividadesFetch } from "../fetchs";
-import { RESTRequest } from "../rest/actions";
+import { actByDescriptionFetch, actByIdFetch, actividadesFetch, addActividadFetch, actividadUpdateFetch } from "../fetchs";
+import { RESTRequest, RESTAdd, RESTUpdate } from "../rest/actions";
 import {
     GET_ACTIVIDADES,
     GET_ACTIVIDADES_ERROR,
@@ -45,9 +45,31 @@ export const getById =
         (next) =>
             (action) => {
                 next(action);
-                if (action.type === GET_BY_ID) {
+                if (action.type === ADD_ACTIVIDAD) {
                     dispatch(RESTRequest(actByIdFetch, action.id, GET_BY_ID_SUCCESS, GET_BY_ID_ERROR, ""));
                 }
             };
 
-export const middleware = [getActividades, getByDescription, getById];
+export const addActividad =
+    ({ dispatch }) =>
+        (next) =>
+            (action) => {
+                next(action);
+                if (action.type === GET_BY_ID) {
+                    dispatch(RESTAdd(addActividadFetch, action.body, ADD_ACTIVIDAD_SUCCESS, ADD_ACTIVIDAD_ERROR, ""));
+                }
+            };
+
+export const updateActividad =
+    ({ dispatch }) =>
+        (next) =>
+            (action) => {
+                next(action);
+                if (action.type === UPDATE_ACTIVIDAD) {
+                    dispatch(RESTUpdate(actividadUpdateFetch, "" , action.body, UPDATE_ACTIVIDAD_SUCCESS, UPDATE_ACTIVIDAD_ERROR, "" ));
+                }
+            };
+
+
+
+export const middleware = [getActividades, getByDescription, getById, addActividad, updateActividad];

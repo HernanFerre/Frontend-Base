@@ -8,13 +8,15 @@ import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
-import { getActividades, getByDescription, getById } from "../../redux/actividad/actions";
+import { getActividades, getByDescription, getById, updateActividad } from "../../redux/actividad/actions";
 
 const ACTIVIDADES_ALL = "actividad.all.timeStamp"
 const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp"
 const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp"
+const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp"
 
-export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION)(LitElement) {
+
+export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
@@ -125,7 +127,8 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
                 @click ="${this.buscar}">Buscar Por Descripcion</button>
             </div> 
 
-            <div class="inner-grid fit18">   
+            <div class="inner-grid fit18"> 
+              <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>
                 <!-- Buscar Todos -->
                 <div style="grid-column: 4 / 7; align-self: center">Buscar Todas Las Actividades </div>                                
                 <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
@@ -143,6 +146,13 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
     }
 
     modificar() {
+        let id = this.shadowRoot.querySelector("#buscarId").value;
+        let descripcion = this.shadowRoot.querySelector("#descripcion").value;
+        let body = {
+            id: id,
+            descripcion: descripcion
+        }
+        store.dispatch(updateActividad(body))
 
     }
 
@@ -169,6 +179,9 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
         }
         if (name == ACTIVIDADES_BY_ID) {
             this.item = state.actividad.entity;
+        }
+        if (name == ACTIVIDADES_UPDATE) {
+            this.buscarTodos()
         }
     }
 
