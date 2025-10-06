@@ -9,20 +9,25 @@ import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { getActividades, getByDescription, getById, updateActividad } from "../../redux/actividad/actions";
+import { isInLayout } from "../../redux/screens/screenLayouts";
 
 const ACTIVIDADES_ALL = "actividad.all.timeStamp"
 const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp"
 const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp"
 const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp"
+const MEDIA_CHANGE = "ui.media.timeStamp";
+const SCREEN = "screen.timeStamp";
 
 
-export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
+export class MisActividades extends connect(store, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
         this.item = {};
         this.itemByDescription = {};
-        this.items = []
+        this.items = [];
+        this.mediaSize = null;
+        this.area = "body";
     }
 
     static get styles() {
@@ -208,6 +213,15 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
     }
 
     stateChanged(state, name) {
+        if (name == SCREEN || name == MEDIA_CHANGE) {
+            this.mediaSize = state.ui.media.size;
+            this.hidden = true;
+            const isCurrentScreen = ["Actividades"].some(s => s == state.screen.name);
+            if (isInLayout(state, this.area) && isCurrentScreen) {
+                this.hidden = false;
+            }
+        }
+
         if (name == ACTIVIDADES_ALL) {
             this.items = state.actividad.entities;
         }
@@ -236,6 +250,12 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
             },
             items: {
                 type: Array,
+            },
+            mediaSize: {
+                type: String,
+            },
+            area: {
+                type: String,
             }
 
         };

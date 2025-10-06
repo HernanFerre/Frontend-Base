@@ -9,20 +9,24 @@ import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
+import { isInLayout } from "../../redux/screens/screenLayouts";
 
 
 const ART_BY_ID = "art.byId.timeStamp";
 const ART_BY_DESCRIPTION = "art.byDescription.timeStamp";
 const ART_ALL = "art.all.timeStamp";
 const ART_UPDATE = "art.updateArt.timeStamp"
+const MEDIA_CHANGE = "ui.media.timeStamp";
+const SCREEN = "screen.timeStamp";
 
-export class MiComponente extends connect(store, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE)(LitElement) {
+export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
         this.item = {};
         this.itemByDescription = {};
         this.items = []
+        this.area = "body"
     }
 
 
@@ -175,6 +179,15 @@ static get styles() {
     }
 
     stateChanged(state, name) {
+        if (name == SCREEN || name == MEDIA_CHANGE) {
+            this.mediaSize = state.ui.media.size;
+            this.hidden = true;
+            const isCurrentScreen = ["ART"].some(s => s == state.screen.name);
+            if (isInLayout(state, this.area) && isCurrentScreen) {
+                this.hidden = false;
+            }
+        }
+
         if (name == ART_BY_ID) {
             this.item = state.art.entity;
         }
@@ -204,6 +217,12 @@ static get styles() {
             },
             items: {
                 type: Array,
+            },
+            mediaChange: {
+                type: String,
+            },
+            area: {
+                type: String,
             }
 
         };

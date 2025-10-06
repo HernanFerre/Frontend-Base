@@ -8,41 +8,17 @@ export const screenLayuts = {
         medium: HEADER_BODY,
         large: HEADER_BODY,
     },
-    bonos: {
+    ART: {
+        small: HEADER_BODY,
+        medium: ALL_BODY,
+        large: HEADER_BODY,
+    },
+    Actividades: {
         small: HEADER_BODY,
         medium: HEADER_BODY,
         large: HEADER_BODY,
-    },
-    consultarFacturas: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
-    aprobacionFacturas: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
-    detalleFactura: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
-    detalleFacturaC: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
-    generarBonos: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
-    presentacionesCabecera: {
-        small: HEADER_BODY,
-        medium: HEADER_BODY,
-        large: HEADER_BODY,
-    },
+    }
+    
 };
 
 export const getLayout = (state) => {

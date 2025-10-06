@@ -52,6 +52,9 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
                 background: var(--secundario);
                 border-radius: 5px;
             }
+            *[hidden]{
+                display:none;
+            }
         `;
     }
 
@@ -61,7 +64,7 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
             <div class="spinner" anillo fixed hidden></div>
             <menu-principal area="header"></menu-principal>
             <!-- <form-test area="body"></form-test>  Eliminar para que se borren los botones -->
-             <!-- <mi-componente></mi-componente> -->
+            <mi-componente></mi-componente>
             <mis-actividades></mis-actividades>
         `;
     }
