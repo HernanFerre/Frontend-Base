@@ -90,6 +90,39 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
             div {
             color: var(--on-formulario, #e6e6e6);
             }
+            .results-grid .header:nth-child(1),
+            .results-grid .header:nth-child(2) {
+                margin-bottom: 0.5rem; /* separa visualmente header de filas */
+                border-bottom: 2px solid var(--primary-color, #2196f3);
+                padding-bottom: 0.4rem;
+            }
+
+            .results-grid{
+                display: grid;
+                grid-template-columns: 400px 1fr;
+                column-gap: .75rem;
+                row-gap: 0;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            .results-grid .header {
+                font-weight: 600;
+                background-color: rgba(255, 255, 255, 0.1);
+                padding: 0.5rem;
+                border-bottom: 2px solid var(--primary-color,#2196f3 );
+                
+            }
+
+            .results-grid > div:not(.headere) {
+                padding: 0.4rem 0.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .results-grid > div:not(.header):nth-child(4n + 3),
+            .results-grid > div:not(.header):nth-child(4n + 4) {
+            background-color: rgba(255, 255, 255, 0.04);
+            }
             
         `;
     }
@@ -97,6 +130,9 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
     render() {
         return html`
             <!-- Buscar por ID -->
+             <div>
+                <h1>ACTIVIDADES</h1>
+             </div>
             <div class="inner-grid fit18">
                 <div class="input" style="grid-column: 1 / 9">
                     <input id="buscarId"/>
@@ -133,14 +169,15 @@ export class MisActividades extends connect(store, ACTIVIDADES_ALL, ACTIVIDADES_
                 <div style="grid-column: 4 / 7; align-self: center">Buscar Todas Las Actividades </div>                                
                 <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
             </div>
-
-            ${this.items?.map(
-            (actividad) => html`
-                <div>${actividad.descripcion}</div>
-                <div>${actividad.id}</div>
-              `
-
-        )}
+            <div class = "results-grid">
+                <div class="header">ID</div>
+                <div class="header">Descripción</div>
+                ${this.items?.map(
+                    (actividad) => html`
+                    <div>${actividad.id}</div>
+                    <div>${actividad.descripcion}</div>
+                ` )}
+            </div>
 
         `;
     }
