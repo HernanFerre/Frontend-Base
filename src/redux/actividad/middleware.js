@@ -45,7 +45,7 @@ export const getById =
         (next) =>
             (action) => {
                 next(action);
-                if (action.type === ADD_ACTIVIDAD) {
+                if (action.type === GET_BY_ID) {
                     dispatch(RESTRequest(actByIdFetch, action.id, GET_BY_ID_SUCCESS, GET_BY_ID_ERROR, ""));
                 }
             };
@@ -55,7 +55,7 @@ export const addActividad =
         (next) =>
             (action) => {
                 next(action);
-                if (action.type === GET_BY_ID) {
+                if (action.type === ADD_ACTIVIDAD) {
                     dispatch(RESTAdd(addActividadFetch, action.body, ADD_ACTIVIDAD_SUCCESS, ADD_ACTIVIDAD_ERROR, ""));
                 }
             };

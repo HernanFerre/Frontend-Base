@@ -3,7 +3,7 @@
 import { html, LitElement, css } from "lit";
 import { store } from "../../redux/store";
 import { connect } from "@brunomon/helpers/connect";
-import { getArt, getByDescription, getById, updateArt } from "../../redux/art/actions";
+import { getArt, getByDescription, getById, updateArt, addArt } from "../../redux/art/actions";
 import { gridLayout } from "@brunomon/template-lit/src/views/css/gridLayout";
 import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
@@ -12,14 +12,16 @@ import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 
 
+
 const ART_BY_ID = "art.byId.timeStamp";
+const ART_ADD = "art.addArt.timeStamp"
 const ART_BY_DESCRIPTION = "art.byDescription.timeStamp";
 const ART_ALL = "art.all.timeStamp";
 const ART_UPDATE = "art.updateArt.timeStamp"
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
-export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE)(LitElement) {
+export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE, ART_ADD)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
@@ -95,6 +97,40 @@ static get styles() {
             div {
             color: var(--on-formulario, #e6e6e6);
             }
+
+             .results-grid .header:nth-child(1),
+            .results-grid .header:nth-child(2) {
+                margin-bottom: 0.5rem; /* separa visualmente header de filas */
+                border-bottom: 2px solid var(--primary-color, #2196f3);
+                padding-bottom: 0.4rem;
+            }
+
+            .results-grid{
+                display: grid;
+                grid-template-columns: 400px 1fr;
+                column-gap: .75rem;
+                row-gap: 0;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            .results-grid .header {
+                font-weight: 600;
+                background-color: rgba(255, 255, 255, 0.1);
+                padding: 0.5rem;
+                border-bottom: 2px solid var(--primary-color,#2196f3 );
+                
+            }
+
+            .results-grid > div:not(.headere) {
+                padding: 0.4rem 0.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .results-grid > div:not(.header):nth-child(4n + 3),
+            .results-grid > div:not(.header):nth-child(4n + 4) {
+            background-color: rgba(255, 255, 255, 0.04);
+            }
             
         `;
     }
@@ -132,24 +168,48 @@ static get styles() {
                 <button raised
                 style="grid-column: 2 / 8; align-self: end"
                 @click ="${this.buscar}">Buscar Por Descripcion</button>
+                <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>  
+            </div>
+                        <!-- AGREGAR -->
+            <div class="inner-grid fit18">
+                <label style="grid-column: 1 / 4; align-self: center">AGREGAR ART</label>
+
+                    <div class="input" style="grid-column: 1 / 9">
+                        <input id="agregar"/>
+                        <label for="agregar">Descripción</label>
+                        <label subtext>Agregar el nombre de la ART</label>
+                    </div>
+
+                <button raised
+                style="grid-column: 2 / 8; align-self: end"
+                @click ="${this.agregar}">AGREGAR</button>
             </div>
             <!-- Modificar -->
             <div class="inner-grid fit18">               
-                <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>                   
                 <!-- Buscar Todos -->
                 <div style="grid-column: 4 / 7; align-self: center">ART Buscar TODOS </div>                                
                 <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
+            </div>        
+
+            <div class = "results-grid">
+                <div class="header">ID</div>
+                <div class="header">Descripción</div>
+                ${this.items?.map(
+                    (art) => html`
+                    <div>${art.id}</div>
+                    <div>${art.descripcion}</div>
+                ` )}
             </div>
-        
-            ${this.items?.map(
-            (art) => html`
-                <div>${art.descripcion}</div>
-                <div>${art.id}</div>
-              `
-                
-            )}
             
         `;
+    }
+
+    agregar() {
+        let descripcion = this.shadowRoot.querySelector("#agregar").value;
+        let body = {
+            descripcion: descripcion
+        }
+        store.dispatch(addArt(body));
     }
 
     modificar() {
@@ -186,6 +246,10 @@ static get styles() {
             if (isInLayout(state, this.area) && isCurrentScreen) {
                 this.hidden = false;
             }
+        }
+
+        if (name == ART_ADD) {
+            this.buscarTodos()
         }
 
         if (name == ART_BY_ID) {

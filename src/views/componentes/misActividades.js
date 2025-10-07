@@ -8,9 +8,11 @@ import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
-import { getActividades, getByDescription, getById, updateActividad } from "../../redux/actividad/actions";
+import { getActividades, getByDescription, getById, updateActividad, addActividad } from "../../redux/actividad/actions";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 
+
+const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp"
 const ACTIVIDADES_ALL = "actividad.all.timeStamp"
 const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp"
 const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp"
@@ -19,7 +21,7 @@ const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
 
-export class MisActividades extends connect(store, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
+export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
@@ -166,10 +168,25 @@ export class MisActividades extends connect(store, SCREEN, MEDIA_CHANGE, ACTIVID
                 <button raised
                 style="grid-column: 2 / 8; align-self: end"
                 @click ="${this.buscar}">Buscar Por Descripcion</button>
-            </div> 
+                <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>
+            </div>
+            
+                                    <!-- AGREGAR -->
+            <div class="inner-grid fit18">
+                <label style="grid-column: 1 / 4; align-self: center">AGREGAR ACTIVIDAD</label>
+
+                    <div class="input" style="grid-column: 1 / 9">
+                        <input id="agregar"/>
+                        <label for="agregar">Descripción</label>
+                        <label subtext>Agregar la descripcion de la Actividad</label>
+                    </div>
+
+                <button raised
+                style="grid-column: 2 / 8; align-self: end"
+                @click ="${this.agregar}">AGREGAR</button>
+            </div>
 
             <div class="inner-grid fit18"> 
-              <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>
                 <!-- Buscar Todos -->
                 <div style="grid-column: 4 / 7; align-self: center">Buscar Todas Las Actividades </div>                                
                 <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
@@ -186,6 +203,16 @@ export class MisActividades extends connect(store, SCREEN, MEDIA_CHANGE, ACTIVID
 
         `;
     }
+
+        agregar() {
+            let descripcion = this.shadowRoot.querySelector("#agregar").value;
+            
+            let body = {
+                descripcion: descripcion,
+                esParaDenunciaUrgente: true
+            }
+            store.dispatch(addActividad(body));
+        }
 
     modificar() {
         let id = this.shadowRoot.querySelector("#buscarId").value;
@@ -232,6 +259,10 @@ export class MisActividades extends connect(store, SCREEN, MEDIA_CHANGE, ACTIVID
             this.item = state.actividad.entity;
         }
         if (name == ACTIVIDADES_UPDATE) {
+            this.buscarTodos()
+        }
+
+        if (name == ACTIVIDADES_ADD) {
             this.buscarTodos()
         }
     }
