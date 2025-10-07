@@ -17,6 +17,11 @@ export const screenLayuts = {
         small: HEADER_BODY,
         medium: HEADER_BODY,
         large: HEADER_BODY,
+    },
+    Relevadores: {
+        small: HEADER_BODY,
+        medium: HEADER_BODY,
+        large: HEADER_BODY,
     }
     
 };
