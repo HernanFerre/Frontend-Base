@@ -161,8 +161,8 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
                         <input id="descripcion"/>
                         <label for="descripcion">Descripción</label>
                         <label subtext>Texto parcial o completo</label>
-                        <div>${this.itemByDescription.descripcion}</div>
-                        <div>${this.itemByDescription.id}</div>
+                        <div>${this.itemByDescription?.descripcion}</div>
+                        <div>${this.itemByDescription?.id}</div>
                     </div>
 
                 <button raised
@@ -171,7 +171,7 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
                 <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>
             </div>
             
-                                    <!-- AGREGAR -->
+            <!-- AGREGAR -->
             <div class="inner-grid fit18">
                 <label style="grid-column: 1 / 4; align-self: center">AGREGAR ACTIVIDAD</label>
 

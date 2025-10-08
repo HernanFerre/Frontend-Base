@@ -24,4 +24,6 @@ export const actByDescriptionFetch = fetchFactory(webApi, "Actividad/GetByDescri
 export const actByIdFetch = fetchFactory(webApi, "Actividad/GetById");
 export const addActividadFetch = fetchFactory(webApi, "Actividad/Add");
 export const actividadUpdateFetch = fetchFactory(webApi, "Actividad/Update");
-export const relevadorGetAllFetch = fetchFactory(webApi, "Relevador/All")
+export const relevadorGetAllFetch = fetchFactory(webApi, "Relevador/All");
+export const relevadorByIdFetch = fetchFactory(webApi, "Relevador/GetById");
+export const relevadorByUserIdFetch = fetchFactory(webApi, "Relevador/GetByUserId");

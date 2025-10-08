@@ -9,14 +9,16 @@ import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
-import { getRelevador } from "../../redux/relevador/actions";
+import { getRelevador, getRelevadorById, getRelevadorByUserId } from "../../redux/relevador/actions";
 
-const RELEVADOR_GET_ALL = "relevador.all.timeStamp"
+const RELEVADOR_BY_USER_ID = "relevador.byUserId.timeStamp";
+const RELEVADOR_BY_ID = "relevador.byId.timeStamp";
+const RELEVADOR_GET_ALL = "relevador.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
 
-export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
+export class MisRelevadores extends connect(store,RELEVADOR_BY_USER_ID, RELEVADOR_BY_ID, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
@@ -142,33 +144,64 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
     render() {
         return html`
             <!-- Buscar por ID -->
-             <div>
+            <div>
                 <h1>RELEVADORES</h1>
-             </div>
-
-                             <!-- Buscar Todos -->
-            <div style="grid-column: 4 / 7; align-self: center">Buscar Todos los Relevadores                                
-                <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
             </div>
-            <div style="grid-column: 1 / 18">   
-                <div class = "results-grid">
-                    <div class="header">ID</div>
-                    <div class="header">email</div>
-                    <div class="header">Nombre</div>
-                    <div class="header">ID Usuario</div>
-                    <div class="header">Apellido</div>
-                    <div class="header">Departamento</div>
-                    <div class="header">Nombre De Usuario</div>
-                    ${this.items?.map(
-                        (relevador) => html`
-                        <div>${relevador.id}</div>
-                        <div>${relevador.email}</div>
-                        <div>${relevador.nombre}</div>
-                        <div>${relevador.usuarioId}</div>
-                        <div>${relevador.apellido}</div>
-                        <div>${relevador.departamento}</div>
-                        <div>${relevador.nombreDeUsuario}</div>
-                    ` )}
+            <!-- Buscar por ID -->
+            <div class="inner-grid fit18">
+                <div class="input" style="grid-column: 1 / 9">                
+                    <input id="buscarId"/>
+                        <label for="buscarId">ID</label>
+                        <label subtext>Ingresá un ID para buscar</label>
+                    <div>${this.item.nombre}</div>
+                    <div>${this.item.apellido}</div>
+                    <div>${this.item.id}</div>
+                </div>
+                <button raised action
+                style="grid-column: 2 / 8; align-self: center"
+                @click="${this.buscarPorId}">Buscar por ID</button>
+            </div>
+
+            <!-- Buscar por User ID -->
+            <div class="inner-grid fit18">
+                <div class="input" style="grid-column: 1 / 9">                
+                    <input id="buscarUserId"/>
+                        <label for="buscarUserId">USER ID</label>
+                        <label subtext>Ingresá un ID de Usuario para buscar</label>
+                    <div>${this.item.nombre}</div>
+                    <div>${this.item.apellido}</div>
+                    <div>${this.item.id}</div>
+                </div>
+                <button raised action
+                style="grid-column: 2 / 8; align-self: center"
+                @click="${this.buscarPorUserId}">Buscar por User ID</button>
+            </div>
+
+            <!-- Buscar Todos -->
+            <div class="inner-grid fit18">
+                <div style="grid-column: 3 / 7; align-self: center">Buscar Todos los Relevadores
+                <button link action @click ="${this.buscarTodos}" style="grid-column: 5 / 8">Buscar Todos</button>
+                </div>
+                <div style="grid-column: 1 / 18">   
+                    <div class = "results-grid">
+                        <div class="header">ID</div>
+                        <div class="header">email</div>
+                        <div class="header">Nombre</div>
+                        <div class="header">ID Usuario</div>
+                        <div class="header">Apellido</div>
+                        <div class="header">Departamento</div>
+                        <div class="header">Nombre De Usuario</div>
+                        ${this.items?.map(
+                            (relevador) => html`
+                            <div>${relevador.id}</div>
+                            <div>${relevador.email}</div>
+                            <div>${relevador.nombre}</div>
+                            <div>${relevador.usuarioId}</div>
+                            <div>${relevador.apellido}</div>
+                            <div>${relevador.departamento}</div>
+                            <div>${relevador.nombreDeUsuario}</div>
+                        ` )}
+                    </div>
                 </div>
             </div>
             
@@ -178,6 +211,16 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
 
     buscarTodos() {
         store.dispatch(getRelevador())
+    }
+
+    buscarPorId() {
+        let id = this.shadowRoot.querySelector("#buscarId").value;
+        store.dispatch(getRelevadorById(id));
+    }
+
+    buscarPorUserId() {
+        let userId = this.shadowRoot.querySelector("#buscarUserId").value;
+        store.dispatch(getRelevadorByUserId(userId));
     }
 
     stateChanged(state, name) {
@@ -192,6 +235,14 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
 
         if (name == RELEVADOR_GET_ALL) {
             this.items = state.relevador.entities;
+        }
+
+        if (name == RELEVADOR_BY_ID) {
+            this.item = state.relevador.entity;
+        }
+
+        if (name == RELEVADOR_BY_USER_ID) {
+            this.item = state.relevador.entity;
         }
 
 

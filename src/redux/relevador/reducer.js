@@ -3,6 +3,10 @@
 import {
     GET_RELEVADOR_ERROR,
     GET_RELEVADOR_SUCCESS,
+    GET_RELEVADOR_BY_ID_ERROR,
+    GET_RELEVADOR_BY_ID_SUCCESS,
+    GET_RELEVADOR_BY_USER_ID_ERROR,
+    GET_RELEVADOR_BY_USER_ID_SUCCESS
 
 } from "./actions";
 
@@ -11,7 +15,11 @@ const initialState = {
         timeStamp: null,
         timeStampError: null
     },
-    byId: {
+    byId: {        
+        timeStamp: null,
+        timeStampError: null
+    },
+    byUserId: {
         timeStamp: null,
         timeStampError: null
     },
@@ -32,6 +40,22 @@ export const reducer = (state = initialState, action) => {
         case GET_RELEVADOR_ERROR:
             newState.all.timeStampError = new Date().getTime();
             newState.entities = [];
+            break;
+        case GET_RELEVADOR_BY_ID_SUCCESS:
+            newState.byId.timeStamp = new Date().getTime();
+            newState.entity = action.payload.receive;
+            break;
+        case GET_RELEVADOR_BY_ID_ERROR:
+            newState.byId.timeStampError = new Date().getTime();
+            newState.entity = null;
+            break;
+        case GET_RELEVADOR_BY_USER_ID_SUCCESS:
+            newState.byUserId.timeStamp = new Date().getTime();
+            newState.entity = action.payload.receive;
+            break;
+        case GET_RELEVADOR_BY_USER_ID_ERROR:
+            newState.byUserId.timeStampError = new Date().getTime();
+            newState.entity = null;
             break;
         
     }
