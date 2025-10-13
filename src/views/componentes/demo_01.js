@@ -43,14 +43,14 @@ export class convenioComponent extends connect(
     return css`
       ${gridLayout}
       ${input}
-        ${button}
-        ${select}
-        ${check}
-        :host {
-        display: grid;
-        overflow: none;
-        padding: 1rem;
-        place-content: center;
+      ${button}
+      ${select}
+      ${check}
+      :host {
+      display: grid;
+      overflow: none;
+      padding: 1rem;
+      place-content: center;
       }
 
       :host([hidden]) {

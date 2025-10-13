@@ -10,6 +10,8 @@ import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { getActividades, getByDescription, getById, updateActividad, addActividad } from "../../redux/actividad/actions";
 import { isInLayout } from "../../redux/screens/screenLayouts";
+import { showAlert, showError } from "../../redux/ui/actions";
+import { CANCELAR, CHECK, MAS } from "../../../assets/icons/svgs"
 
 
 const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp"
@@ -24,10 +26,10 @@ const SCREEN = "screen.timeStamp";
 export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
     constructor() {
         super();
-        this.hidden = false;
+        // this.hidden = false;
         this.item = {};
         this.itemByDescription = {};
-        this.items = [];
+        this.actividades = [];
         this.mediaSize = null;
         this.area = "body";
     }
@@ -40,95 +42,103 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         ${check}
         ${button}
 
-        :host {
+        
+            :host {
             display: grid;
-            grid-auto-flow: row;
-            background-color: var(--formulario);
-            padding: 2rem;
-            grid-gap: 1rem;
-            overflow-y: scroll;
-        }
-        .inner-grid.fit18 {
-            display: grid;
-            grid-template-columns: repeat(18, minmax(0, 1fr));
-            gap: 1rem;                /* separa columnas/filas */
-            align-items: end;         /* botones e inputs al mismo “renglón” */
-            margin-bottom: 1.25rem;   /* separa bloques entre sí */
+            overflow: none;
+            padding: 1rem;
+            place-content: center;
             }
 
-            /* Altura consistente entre inputs y botones */
-            input,
-            select,
-            textarea {
-            height: 40px;
-            padding: 0 .75rem;
-            line-height: 40px;
-            border-radius: 10px;
+            :host([hidden]) {
+                display: none;
             }
-            button {
-            height: 40px;
-            padding: 0 1rem;
-            align-self: end; /* se alinea con el borde inferior del input */
+            *[hidden] {
+                display: none;
+            }
+            *[oculto] {
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                opacity: 0;
+            }
+            .main {
+                background-color: var(--formulario);
+                width: 32vw;
+                height: 70vh;
+                overflow: none;
+                border-radius: 0.5rem 0.5rem 0 0;
+                box-shadow: var(--shadow-elevation-3-box);
+                grid-gap: 0 !important;
+                grid-template-rows: auto 1fr;
+            }
+            .cabecera {
+                color: var(--on-formulario-bajada);
+                grid-template-columns: 0.5fr 1fr 0.5fr;
+                border-bottom: 1px solid var(--velo);
+            }
+            .contenedor {
+                color: var(--on-formulario);
+                height: 61vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            .contenedor::-webkit-scrollbar {
+                width: 0.5rem;
+                height: 0.5rem;
+            }
+            .contenedor::-webkit-scrollbar-thumb {
+                background: var(--secundario10);
+                border-radius: 4px;
+            }
+            .contenedor::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+            }
+            .cabecera div button {
+                padding: 0.25rem;
+                width: 2.75rem;
+            }
+            .item {
+                height: 3rem;
+                width: 30vw;
+                transition: 0.5s ease;
+                overflow: none;
+                grid-template-columns: 30vw 0;
+            }
+            .item[modificando] {
+                grid-template-columns: 26.5vw 2.75rem;
+            }
+            .item button {
+                width: 2.75rem;
+                padding: 0.25rem;
+            }
+            button[flat] svg {
+                fill: var(--primario);
+            }
+            button[flat]:hover svg {
+                fill: var(--on-primario);
+            }
+            button[flat]:focus svg {
+                fill: var(--on-primario);
             }
 
-            /* Labels y subtext más legibles y compactos */
-            .input > label:not([subtext]) {
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
-            margin-bottom: .35rem;
-            display: inline-block;
+            select[disabled] {
+                opacity: 1 !important;
+                cursor: inherit;
+                background-image: none !important;
             }
-            .input > label[subtext] {
-            font-size: .75rem;
-            opacity: .75;
-            margin-top: .35rem;
-            display: block;
+            .cabecera button svg {
+                transition: 0.3s;
             }
-
-            /* Título y bloques generales */
-            h1 {
-            margin: 0 0 1rem 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
+            button[cancelar] {
+                background-color: var(--error) !important;
             }
-
-            /* Texto (como tus resultados individuales) más nítido */
-            div {
-            color: var(--on-formulario, #e6e6e6);
+            button[cancelar] svg {
+                transform: rotate(45deg);
             }
-            .results-grid .header:nth-child(1),
-            .results-grid .header:nth-child(2) {
-                margin-bottom: 0.5rem; /* separa visualmente header de filas */
-                border-bottom: 2px solid var(--primary-color, #2196f3);
-                padding-bottom: 0.4rem;
-            }
-
-            .results-grid{
-                display: grid;
-                grid-template-columns: 400px 1fr;
-                column-gap: .75rem;
-                row-gap: 0;
-                align-items: center;
-                margin-top: 1rem;
-            }
-
-            .results-grid .header {
-                font-weight: 600;
-                background-color: rgba(255, 255, 255, 0.1);
-                padding: 0.5rem;
-                border-bottom: 2px solid var(--primary-color,#2196f3 );
-                
-            }
-
-            .results-grid > div:not(.headere) {
-                padding: 0.4rem 0.5rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .results-grid > div:not(.header):nth-child(4n + 3),
-            .results-grid > div:not(.header):nth-child(4n + 4) {
-            background-color: rgba(255, 255, 255, 0.04);
+            .item[nuevo] {
+                opacity: 0.3;
             }
             
         `;
@@ -137,82 +147,145 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
     render() {
         return html`
             <!-- Buscar por ID -->
-             <div>
+            <div>
                 <h1>ACTIVIDADES</h1>
-             </div>
-            <div class="inner-grid fit18">
-                <div class="input" style="grid-column: 1 / 9">
-                    <input id="buscarId"/>
-                        <label for="buscarId">ID</label>
-                        <label subtext>Ingresá un ID para buscar</label>
-                    <div>${this.item.descripcion}</div>
-                    <div>${this.item.id}</div>
+            </div>
+            <div class="main inner-grid row">
+                <div class="inner-grid cabecera column">
+                    <div></div>
+                    <div class="grid center">Descripcion</div>
+                    <div class="grid end">
+                        <button
+                        raised
+                        @click="${this.agregarOCancelar}"
+                        ?cancelar="${this.agregando == true || this.modificando == true}"
+                        >
+                        ${MAS}
+                        </button>
+                    </div>                               
                 </div>
-                <button raised action
-                style="grid-column: 2 / 8; align-self: center"
-                @click="${this.buscarPorId}">Buscar por ID</button>
-            </div>
 
-            <!-- Buscar por Descripcion -->
-            <div class="inner-grid fit18">
-                <label style="grid-column: 1 / 4; align-self: center">Buscar por Descripcion</label>
-
-                    <div class="input" style="grid-column: 1 / 9">
-                        <input id="descripcion"/>
-                        <label for="descripcion">Descripción</label>
-                        <label subtext>Texto parcial o completo</label>
-                        <div>${this.itemByDescription?.descripcion}</div>
-                        <div>${this.itemByDescription?.id}</div>
+                <div class="contenedor">
+                <div
+                    class="grid item"
+                    id="ultimo"
+                    ?oculto="${!this.agregando}"
+                    ?modificando=${this.agregando}
+                >
+                    <div class="input">
+                    <input
+                        class="grid center"
+                        ?oculto="${!this.agregando}"
+                        id="input-agregar"
+                    />
                     </div>
-
-                <button raised
-                style="grid-column: 2 / 8; align-self: end"
-                @click ="${this.buscar}">Buscar Por Descripcion</button>
-                <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>
+                    <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">
+                    ${CHECK}
+                    </button>
+                </div>
+                ${this.actividades.map(
+                    (actividad) =>
+                    html` <div
+                        class="grid item"
+                        ultimoid="${actividad.id}"
+                        .actividad=${actividad}
+                        ?modificando=${actividad.modificando}
+                    >
+                        <div class="input">
+                        <input
+                            class="grid center input-descripcion"
+                            .value="${actividad.descripcion}"
+                            @input="${(e) => {
+                            this.editando(e);
+                            }}"
+                        />
+                        </div>
+                        <button
+                        flat
+                        ?oculto="${!actividad.modificando}"
+                        @click="${(e) => {
+                            this.editar(e, actividad);
+                        }}"
+                        >
+                        ${CHECK}
+                        </button>
+                    </div>`
+                )}
+                </div>
             </div>
-            
-            <!-- AGREGAR -->
-            <div class="inner-grid fit18">
-                <label style="grid-column: 1 / 4; align-self: center">AGREGAR ACTIVIDAD</label>
-
-                    <div class="input" style="grid-column: 1 / 9">
-                        <input id="agregar"/>
-                        <label for="agregar">Descripción</label>
-                        <label subtext>Agregar la descripcion de la Actividad</label>
-                    </div>
-
-                <button raised
-                style="grid-column: 2 / 8; align-self: end"
-                @click ="${this.agregar}">AGREGAR</button>
-            </div>
-
-            <div class="inner-grid fit18"> 
-                <!-- Buscar Todos -->
-                <div style="grid-column: 4 / 7; align-self: center">Buscar Todas Las Actividades </div>                                
-                <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
-            </div>
-            <div class = "results-grid">
-                <div class="header">ID</div>
-                <div class="header">Descripción</div>
-                ${this.items?.map(
-                    (actividad) => html`
-                    <div>${actividad.id}</div>
-                    <div>${actividad.descripcion}</div>
-                ` )}
-            </div>
-
         `;
     }
 
-        agregar() {
-            let descripcion = this.shadowRoot.querySelector("#agregar").value;
-            
-            let body = {
-                descripcion: descripcion,
-                esParaDenunciaUrgente: true
-            }
-            store.dispatch(addActividad(body));
+    agregarOCancelar() {
+        if (this.agregando || this.modificando) {
+        this.modificando = false;
+        this.agregando = false;
+
+        this.actividades.forEach((actividad) => {
+            actividad.modificando = false;
+        });
+
+        const actividades = this.actividades;
+        this.actividades = [];
+        this.update();
+        this.actividades = actividades;
+        this.update();
+        return;
         }
+
+        this.agregando = true;
+        this.shadowRoot.querySelector("#ultimo")?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "end",
+        });
+        this.shadowRoot.querySelector("#input-agregar").value = "";
+        this.update();
+    }
+
+    editando(e) {
+        let padre = e.currentTarget.parentElement;
+        while (padre) {
+            if (padre.actividad) {
+                padre.actividad.modificando = true;
+                break;
+            } else {
+                padre = padre.parentElement;
+            }
+        }
+        this.modificando = true;
+        this.update();
+    }
+    
+    agregar() {
+        let body = {
+        descripcion: this.shadowRoot.querySelector("#input-agregar").value,
+        modo: "",
+        };
+        store.dispatch(add(body));
+    }
+
+    editar(e, convenio) {
+        let padre = e.currentTarget.parentElement;
+        let body = {
+        convenioId: convenio.id,
+        descripcion: padre.querySelector(".input-descripcion").value,
+        };
+        store.dispatch(UpdateDescripcion(body));
+    }
+
+
+
+
+    agregar() {
+        let descripcion = this.shadowRoot.querySelector("#agregar").value;
+        
+        let body = {
+            descripcion: descripcion,
+            esParaDenunciaUrgente: true
+        }
+        store.dispatch(addActividad(body));
+    }
 
     modificar() {
         let id = this.shadowRoot.querySelector("#buscarId").value;
@@ -239,6 +312,10 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         store.dispatch(getById(id))
     }
 
+    firstUpdated() {
+        this.buscarTodos()
+     }
+
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
@@ -250,7 +327,8 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         }
 
         if (name == ACTIVIDADES_ALL) {
-            this.items = state.actividad.entities;
+            this.actividades = state.actividad.entities;
+            this.update();
         }
         if (name == ACTIVIDADES_BY_DESCRIPTION) {
             this.itemByDescription = state.actividad.byDescription.entityByDescription[0];
@@ -279,7 +357,7 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             itemByDescription: {
                 type: Object,
             },
-            items: {
+            actividades: {
                 type: Array,
             },
             mediaSize: {
