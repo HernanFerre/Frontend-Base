@@ -11,22 +11,21 @@ import { button } from "@brunomon/template-lit/src/views/css/button";
 import { getActividades, getByDescription, getById, updateActividad, addActividad } from "../../redux/actividad/actions";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 import { showAlert, showError } from "../../redux/ui/actions";
-import { CANCELAR, CHECK, MAS } from "../../../assets/icons/svgs"
+import { CANCELAR, CHECK, MAS } from "../../../assets/icons/svgs";
 
-
-const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp"
-const ACTIVIDADES_ALL = "actividad.all.timeStamp"
-const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp"
-const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp"
-const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp"
+const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp";
+const ACTIVIDADES_ALL = "actividad.all.timeStamp";
+const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp";
+const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp";
+const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
-
 
 export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
     constructor() {
         super();
         // this.hidden = false;
+        this.actividadAddId = null;
         this.item = {};
         this.itemByDescription = {};
         this.actividades = [];
@@ -36,18 +35,18 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
 
     static get styles() {
         return css`
-        ${gridLayout}
-        ${input}
+            ${gridLayout}
+            ${input}
         ${select}
         ${check}
         ${button}
 
         
             :host {
-            display: grid;
-            overflow: none;
-            padding: 1rem;
-            place-content: center;
+                display: grid;
+                overflow: none;
+                padding: 1rem;
+                place-content: center;
             }
 
             :host([hidden]) {
@@ -140,7 +139,6 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             .item[nuevo] {
                 opacity: 0.3;
             }
-            
         `;
     }
 
@@ -155,62 +153,40 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
                     <div></div>
                     <div class="grid center">Descripcion</div>
                     <div class="grid end">
-                        <button
-                        raised
-                        @click="${this.agregarOCancelar}"
-                        ?cancelar="${this.agregando == true || this.modificando == true}"
-                        >
-                        ${MAS}
-                        </button>
-                    </div>                               
+                        <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
+                    </div>
                 </div>
 
                 <div class="contenedor">
-                <div
-                    class="grid item"
-                    id="ultimo"
-                    ?oculto="${!this.agregando}"
-                    ?modificando=${this.agregando}
-                >
-                    <div class="input">
-                    <input
-                        class="grid center"
-                        ?oculto="${!this.agregando}"
-                        id="input-agregar"
-                    />
-                    </div>
-                    <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">
-                    ${CHECK}
-                    </button>
-                </div>
-                ${this.actividades.map(
-                    (actividad) =>
-                    html` <div
-                        class="grid item"
-                        ultimoid="${actividad.id}"
-                        .actividad=${actividad}
-                        ?modificando=${actividad.modificando}
-                    >
+                    <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
                         <div class="input">
-                        <input
-                            class="grid center input-descripcion"
-                            .value="${actividad.descripcion}"
-                            @input="${(e) => {
-                            this.editando(e);
-                            }}"
-                        />
+                            <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
                         </div>
-                        <button
-                        flat
-                        ?oculto="${!actividad.modificando}"
-                        @click="${(e) => {
-                            this.editar(e, actividad);
-                        }}"
-                        >
-                        ${CHECK}
-                        </button>
-                    </div>`
-                )}
+                        <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">${CHECK}</button>
+                    </div>
+                    ${this.actividades.map(
+                        (actividad) =>
+                            html` <div class="grid item" ultimoid="${actividad.id}" .actividad=${actividad} ?modificando=${actividad.modificando}>
+                                <div class="input">
+                                    <input
+                                        class="grid center input-descripcion"
+                                        .value="${actividad.descripcion}"
+                                        @input="${(e) => {
+                                            this.editando(e);
+                                        }}"
+                                    />
+                                </div>
+                                <button
+                                    flat
+                                    ?oculto="${!actividad.modificando}"
+                                    @click="${(e) => {
+                                        this.editar(e, actividad);
+                                    }}"
+                                >
+                                    ${CHECK}
+                                </button>
+                            </div>`
+                    )}
                 </div>
             </div>
         `;
@@ -218,26 +194,26 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
 
     agregarOCancelar() {
         if (this.agregando || this.modificando) {
-        this.modificando = false;
-        this.agregando = false;
+            this.modificando = false;
+            this.agregando = false;
 
-        this.actividades.forEach((actividad) => {
-            actividad.modificando = false;
-        });
+            this.actividades.forEach((actividad) => {
+                actividad.modificando = false;
+            });
 
-        const actividades = this.actividades;
-        this.actividades = [];
-        this.update();
-        this.actividades = actividades;
-        this.update();
-        return;
+            const actividades = this.actividades;
+            this.actividades = [];
+            this.update();
+            this.actividades = actividades;
+            this.update();
+            return;
         }
 
         this.agregando = true;
         this.shadowRoot.querySelector("#ultimo")?.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-        inline: "end",
+            behavior: "smooth",
+            block: "end",
+            inline: "end",
         });
         this.shadowRoot.querySelector("#input-agregar").value = "";
         this.update();
@@ -256,35 +232,22 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         this.modificando = true;
         this.update();
     }
-    
+
     agregar() {
         let body = {
-        descripcion: this.shadowRoot.querySelector("#input-agregar").value,
-        modo: "",
+            descripcion: this.shadowRoot.querySelector("#input-agregar").value,
+            esParaDenunciaUrgente: true,
         };
-        store.dispatch(add(body));
+        store.dispatch(addActividad(body));
     }
 
-    editar(e, convenio) {
+    editar(e, actividad) {
         let padre = e.currentTarget.parentElement;
         let body = {
-        convenioId: convenio.id,
-        descripcion: padre.querySelector(".input-descripcion").value,
+            id: actividad.id,
+            descripcion: padre.querySelector(".input-descripcion").value,
         };
-        store.dispatch(UpdateDescripcion(body));
-    }
-
-
-
-
-    agregar() {
-        let descripcion = this.shadowRoot.querySelector("#agregar").value;
-        
-        let body = {
-            descripcion: descripcion,
-            esParaDenunciaUrgente: true
-        }
-        store.dispatch(addActividad(body));
+        store.dispatch(updateActividad(body));
     }
 
     modificar() {
@@ -292,35 +255,34 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         let descripcion = this.shadowRoot.querySelector("#descripcion").value;
         let body = {
             id: id,
-            descripcion: descripcion
-        }
-        store.dispatch(updateActividad(body))
-
+            descripcion: descripcion,
+        };
+        store.dispatch(updateActividad(body));
     }
 
     buscar() {
         let descripcion = this.shadowRoot.querySelector("#descripcion").value;
-        store.dispatch(getByDescription(descripcion))
-    }
-
-    buscarTodos() {
-        store.dispatch(getActividades())
+        store.dispatch(getByDescription(descripcion));
     }
 
     buscarPorId() {
         let id = this.shadowRoot.querySelector("#buscarId").value;
-        store.dispatch(getById(id))
+        store.dispatch(getById(id));
+    }
+
+    buscarTodos() {
+        store.dispatch(getActividades());
     }
 
     firstUpdated() {
-        this.buscarTodos()
-     }
+        this.buscarTodos();
+    }
 
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
             this.hidden = true;
-            const isCurrentScreen = ["Actividades"].some(s => s == state.screen.name);
+            const isCurrentScreen = ["Actividades"].some((s) => s == state.screen.name);
             if (isInLayout(state, this.area) && isCurrentScreen) {
                 this.hidden = false;
             }
@@ -329,6 +291,20 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         if (name == ACTIVIDADES_ALL) {
             this.actividades = state.actividad.entities;
             this.update();
+            if (this.actividadAddId != null) {
+                let div = this.shadowRoot.querySelector('*[ultimoid="' + this.actividadAddId + '"]');
+                div?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
+                    inline: "end",
+                });
+                div.toggleAttribute("nuevo");
+                setTimeout(() => {
+                    div.toggleAttribute("nuevo");
+                }, 750);
+
+                this.actividadAddId = null;
+            }
         }
         if (name == ACTIVIDADES_BY_DESCRIPTION) {
             this.itemByDescription = state.actividad.byDescription.entityByDescription[0];
@@ -337,11 +313,19 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             this.item = state.actividad.entity;
         }
         if (name == ACTIVIDADES_UPDATE) {
-            this.buscarTodos()
+            let retorno = state.actividad.updateActividad.resultado;
+            if (retorno.StatusCode) {
+                store.dispatch(showAlert("Error ", retorno.Message));
+            } else {
+                this.buscarTodos();
+                this.agregarOCancelar();
+            }
         }
 
         if (name == ACTIVIDADES_ADD) {
-            this.buscarTodos()
+            this.actividadAddId = state.actividad.addActividad.addId;
+            this.agregarOCancelar();
+            this.buscarTodos();
         }
     }
 
@@ -365,8 +349,7 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             },
             area: {
                 type: String,
-            }
-
+            },
         };
     }
 }
