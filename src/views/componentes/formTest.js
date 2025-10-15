@@ -12,13 +12,19 @@ import { button } from "@brunomon/template-lit/src/views/css/button";
 import { SpinnerControl } from "./spinner";
 import { AlertControl } from "./alert";
 import { ConfirmControl } from "./confirm";
+import { isInLayout } from "../../redux/screens/screenLayouts";
 import { showAlert, showConfirm } from "../../redux/ui/actions";
 import { showSpinner } from "../../redux/api/actions";
 
-export class formTest extends connect(store)(LitElement) {
+const MEDIA_CHANGE = "ui.media.timeStamp";
+const SCREEN = "screen.timeStamp";
+
+export class formTest extends connect(store, SCREEN, MEDIA_CHANGE)(LitElement) {
     constructor() {
         super();
         store.dispatch(showSpinner());
+        this.mediaSize = null;
+        this.area = "body";
     }
 
     static get styles() {
@@ -37,6 +43,20 @@ export class formTest extends connect(store)(LitElement) {
                 grid-gap: 1rem;
                 overflow-y: scroll;
             }
+
+            :host([hidden]) {
+                display: none;
+            }
+            *[hidden] {
+                display: none;
+            }
+            *[oculto] {
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                opacity: 0;
+            }
+
             svg {
                 height: 1rem;
                 width: 1.2rem;
@@ -265,7 +285,16 @@ export class formTest extends connect(store)(LitElement) {
         );
     }
 
-    stateChanged(state, name) {}
+    stateChanged(state, name) {
+        if (name == SCREEN || name == MEDIA_CHANGE) {
+            this.mediaSize = state.ui.media.size;
+            this.hidden = true;
+            const isCurrentScreen = ["Demo"].some((s) => s == state.screen.name);
+            if (isInLayout(state, this.area) && isCurrentScreen) {
+                this.hidden = false;
+            }
+        }
+    }
 
     static get properties() {
         return {

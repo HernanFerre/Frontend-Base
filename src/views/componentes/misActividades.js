@@ -11,7 +11,7 @@ import { button } from "@brunomon/template-lit/src/views/css/button";
 import { getActividades, getByDescription, getById, updateActividad, addActividad } from "../../redux/actividad/actions";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 import { showAlert, showError } from "../../redux/ui/actions";
-import { CANCELAR, CHECK, MAS } from "../../../assets/icons/svgs";
+import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
 const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp";
 const ACTIVIDADES_ALL = "actividad.all.timeStamp";
@@ -37,16 +37,21 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         return css`
             ${gridLayout}
             ${input}
-        ${select}
-        ${check}
-        ${button}
+            ${select}
+            ${check}
+            ${button}
 
         
             :host {
-                display: grid;
-                overflow: none;
-                padding: 1rem;
-                place-content: center;
+                background-color: var(--formulario);
+                grid-auto-flow: row;
+                border-radius: 0.5rem 0.5rem 0 0;
+                box-shadow: var(--shadow-elevation-3-box);
+                grid-gap: 0 !important;
+                grid-template-rows: auto 1fr;
+                place-self: center;
+                --ancho-descripcion: 40rem;
+                --ancho-boton: 3rem;
             }
 
             :host([hidden]) {
@@ -60,17 +65,9 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
                 width: 0 !important;
                 padding: 0 !important;
                 opacity: 0;
+                z-index: -10;
             }
-            .main {
-                background-color: var(--formulario);
-                width: 32vw;
-                height: 70vh;
-                overflow: none;
-                border-radius: 0.5rem 0.5rem 0 0;
-                box-shadow: var(--shadow-elevation-3-box);
-                grid-gap: 0 !important;
-                grid-template-rows: auto 1fr;
-            }
+
             .cabecera {
                 color: var(--on-formulario-bajada);
                 grid-template-columns: 0.5fr 1fr 0.5fr;
@@ -78,9 +75,10 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             }
             .contenedor {
                 color: var(--on-formulario);
-                height: 61vh;
+                height: 65vh;
                 overflow-y: auto;
                 overflow-x: hidden;
+                gap: 0;
             }
             .contenedor::-webkit-scrollbar {
                 width: 0.5rem;
@@ -100,16 +98,17 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             }
             .item {
                 height: 3rem;
-                width: 30vw;
                 transition: 0.5s ease;
                 overflow: none;
-                grid-template-columns: 30vw 0;
+                grid-template-columns: var(--ancho-descripcion) 0 0;
+                grid-gap: 0;
             }
             .item[modificando] {
-                grid-template-columns: 26.5vw 2.75rem;
+                grid-template-columns: calc(var(--ancho-descripcion) - 2 * (var(--ancho-boton) + 0.5rem)) var(--ancho-boton) var(--ancho-boton);
+                grid-gap: 0.5rem;
             }
             .item button {
-                width: 2.75rem;
+                width: var(--ancho-boton);
                 padding: 0.25rem;
             }
             button[flat] svg {
@@ -144,50 +143,54 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
 
     render() {
         return html`
-            <!-- Buscar por ID -->
-            <div>
-                <h1>ACTIVIDADES</h1>
+            <div class="inner-grid cabecera column">
+                <div></div>
+                <div class="grid center"><h2>Actividades</h2></div>
+                <div class="grid end">
+                    <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
+                </div>
             </div>
-            <div class="main inner-grid row">
-                <div class="inner-grid cabecera column">
-                    <div></div>
-                    <div class="grid center">Descripcion</div>
-                    <div class="grid end">
-                        <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
-                    </div>
-                </div>
 
-                <div class="contenedor">
-                    <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
-                        <div class="input">
-                            <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
-                        </div>
-                        <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">${CHECK}</button>
+            <div class="contenedor inner-grid">
+                <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
+                    <div class="input">
+                        <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
                     </div>
-                    ${this.actividades.map(
-                        (actividad) =>
-                            html` <div class="grid item" ultimoid="${actividad.id}" .actividad=${actividad} ?modificando=${actividad.modificando}>
-                                <div class="input">
-                                    <input
-                                        class="grid center input-descripcion"
-                                        .value="${actividad.descripcion}"
-                                        @input="${(e) => {
-                                            this.editando(e);
-                                        }}"
-                                    />
-                                </div>
-                                <button
-                                    flat
-                                    ?oculto="${!actividad.modificando}"
-                                    @click="${(e) => {
-                                        this.editar(e, actividad);
-                                    }}"
-                                >
-                                    ${CHECK}
-                                </button>
-                            </div>`
-                    )}
+                    <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">${CHECK}</button>
                 </div>
+                ${this.actividades.map(
+                    (actividad) =>
+                        html` <div class="grid item" ultimoid="${actividad.id}" .actividad=${actividad} ?modificando=${actividad.modificando}>
+                            <div class="input">
+                                <input
+                                    class="grid center input-descripcion"
+                                    .value="${actividad.descripcion}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <button
+                                flat
+                                ?oculto="${!actividad.modificando}"
+                                @click="${(e) => {
+                                    this.editar(e, actividad);
+                                }}"
+                            >
+                                ${CHECK}
+                            </button>
+                            <button
+                                class="eliminable"
+                                flat
+                                ?oculto="${!actividad.modificando}"
+                                @click="${(e) => {
+                                    this.eliminar(e, actividad);
+                                }}"
+                            >
+                                ${DELETE}
+                            </button>
+                        </div>`
+                )}
             </div>
         `;
     }
@@ -220,6 +223,9 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
     }
 
     editando(e) {
+        let anterior = this.shadowRoot.querySelector("[modificando]");
+        if (anterior) anterior.actividad.modificando = false;
+
         let padre = e.currentTarget.parentElement;
         while (padre) {
             if (padre.actividad) {
@@ -230,7 +236,12 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             }
         }
         this.modificando = true;
+        this.esEliminable = false;
         this.update();
+    }
+
+    eliminar() {
+        alert("Eliminando");
     }
 
     agregar() {
@@ -242,20 +253,11 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
     }
 
     editar(e, actividad) {
+        this.actividadAddId = actividad.id;
         let padre = e.currentTarget.parentElement;
         let body = {
             id: actividad.id,
             descripcion: padre.querySelector(".input-descripcion").value,
-        };
-        store.dispatch(updateActividad(body));
-    }
-
-    modificar() {
-        let id = this.shadowRoot.querySelector("#buscarId").value;
-        let descripcion = this.shadowRoot.querySelector("#descripcion").value;
-        let body = {
-            id: id,
-            descripcion: descripcion,
         };
         store.dispatch(updateActividad(body));
     }
@@ -334,6 +336,9 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
             hidden: {
                 type: Boolean,
                 reflect: true,
+            },
+            esEliminable: {
+                type: Boolean,
             },
             item: {
                 type: Object,

@@ -22,8 +22,12 @@ export const screenLayuts = {
         small: HEADER_BODY,
         medium: HEADER_BODY,
         large: HEADER_BODY,
-    }
-    
+    },
+    Demo: {
+        small: HEADER_BODY,
+        medium: HEADER_BODY,
+        large: HEADER_BODY,
+    },
 };
 
 export const getLayout = (state) => {
