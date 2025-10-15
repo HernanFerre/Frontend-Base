@@ -10,246 +10,286 @@ import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
-
-
+import { showAlert, showError } from "../../redux/ui/actions";
+import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
 const ART_BY_ID = "art.byId.timeStamp";
-const ART_ADD = "art.addArt.timeStamp"
+const ART_ADD = "art.addArt.timeStamp";
 const ART_BY_DESCRIPTION = "art.byDescription.timeStamp";
 const ART_ALL = "art.all.timeStamp";
-const ART_UPDATE = "art.updateArt.timeStamp"
+const ART_UPDATE = "art.updateArt.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
 export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE, ART_ADD)(LitElement) {
     constructor() {
         super();
+        this.artAddId = null;
         this.hidden = false;
         this.item = {};
         this.itemByDescription = {};
-        this.items = []
-        this.area = "body"
+        this.artItems = [];
+        this.area = "body";
     }
 
+    static get styles() {
+        return css`
+            ${gridLayout}
+            ${input}
+            ${select}
+            ${check}
+            ${button}
 
-static get styles() {
-    return css`
-        ${gridLayout}
-        ${input}
-        ${select}
-        ${check}
-        ${button}
-
-        :host {
-            display: grid;
-            grid-auto-flow: row;
-            background-color: var(--formulario);
-            padding: 2rem;
-            grid-gap: 1rem;
-            overflow-y: scroll;
-        }
-        .inner-grid.fit18 {
-            display: grid;
-            grid-template-columns: repeat(18, minmax(0, 1fr));
-            gap: 1rem;                /* separa columnas/filas */
-            align-items: end;         /* botones e inputs al mismo “renglón” */
-            margin-bottom: 1.25rem;   /* separa bloques entre sí */
+            :host {
+                background-color: var(--formulario);
+                grid-auto-flow: row;
+                border-radius: 0.5rem 0.5rem 0 0;
+                box-shadow: var(--shadow-elevation-3-box);
+                grid-gap: 0 !important;
+                grid-template-rows: auto 1fr;
+                place-self: center;
+                --ancho-descripcion: 40rem;
+                --ancho-boton: 3rem;
             }
 
-            /* Altura consistente entre inputs y botones */
-            input,
-            select,
-            textarea {
-            height: 40px;
-            padding: 0 .75rem;
-            line-height: 40px;
-            border-radius: 10px;
+            :host([hidden]) {
+                display: none;
             }
-            button {
-            height: 40px;
-            padding: 0 1rem;
-            align-self: end; /* se alinea con el borde inferior del input */
+            *[hidden] {
+                display: none;
             }
-
-            /* Labels y subtext más legibles y compactos */
-            .input > label:not([subtext]) {
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
-            margin-bottom: .35rem;
-            display: inline-block;
-            }
-            .input > label[subtext] {
-            font-size: .75rem;
-            opacity: .75;
-            margin-top: .35rem;
-            display: block;
+            *[oculto] {
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                opacity: 0;
+                z-index: -10;
             }
 
-            /* Título y bloques generales */
-            h1 {
-            margin: 0 0 1rem 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
+            .cabecera {
+                color: var(--on-formulario-bajada);
+                grid-template-columns: 0.5fr 1fr 0.5fr;
+                border-bottom: 1px solid var(--velo);
+            }
+            .contenedor {
+                color: var(--on-formulario);
+                height: 65vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                gap: 0;
+            }
+            .contenedor::-webkit-scrollbar {
+                width: 0.5rem;
+                height: 0.5rem;
+            }
+            .contenedor::-webkit-scrollbar-thumb {
+                background: var(--secundario10);
+                border-radius: 4px;
+            }
+            .contenedor::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+            }
+            .cabecera div button {
+                padding: 0.25rem;
+                width: 2.75rem;
+            }
+            .item {
+                height: 3rem;
+                transition: 0.5s ease;
+                overflow: none;
+                grid-template-columns: var(--ancho-descripcion) 0 0;
+                grid-gap: 0;
+            }
+            .item[modificando] {
+                grid-template-columns: calc(var(--ancho-descripcion) - 2 * (var(--ancho-boton) + 0.5rem)) var(--ancho-boton) var(--ancho-boton);
+                grid-gap: 0.5rem;
+            }
+            .item button {
+                width: var(--ancho-boton);
+                padding: 0.25rem;
+            }
+            button[flat] svg {
+                fill: var(--primario);
+            }
+            button[flat]:hover svg {
+                fill: var(--on-primario);
+            }
+            button[flat]:focus svg {
+                fill: var(--on-primario);
             }
 
-            /* Texto (como tus resultados individuales) más nítido */
-            div {
-            color: var(--on-formulario, #e6e6e6);
+            select[disabled] {
+                opacity: 1 !important;
+                cursor: inherit;
+                background-image: none !important;
             }
-
-             .results-grid .header:nth-child(1),
-            .results-grid .header:nth-child(2) {
-                margin-bottom: 0.5rem; /* separa visualmente header de filas */
-                border-bottom: 2px solid var(--primary-color, #2196f3);
-                padding-bottom: 0.4rem;
+            .cabecera button svg {
+                transition: 0.3s;
             }
-
-            .results-grid{
-                display: grid;
-                grid-template-columns: 400px 1fr;
-                column-gap: .75rem;
-                row-gap: 0;
-                align-items: center;
-                margin-top: 1rem;
+            button[cancelar] {
+                background-color: var(--error) !important;
             }
-
-            .results-grid .header {
-                font-weight: 600;
-                background-color: rgba(255, 255, 255, 0.1);
-                padding: 0.5rem;
-                border-bottom: 2px solid var(--primary-color,#2196f3 );
-                
+            button[cancelar] svg {
+                transform: rotate(45deg);
             }
-
-            .results-grid > div:not(.headere) {
-                padding: 0.4rem 0.5rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            .item[nuevo] {
+                opacity: 0.3;
             }
-
-            .results-grid > div:not(.header):nth-child(4n + 3),
-            .results-grid > div:not(.header):nth-child(4n + 4) {
-            background-color: rgba(255, 255, 255, 0.04);
-            }
-            
         `;
     }
 
-
-
-    render() { 
+    render() {
         return html`
-        <h1>ART</h1>
-            <!-- Buscar por ID -->
-        <div class="inner-grid fit18">
-            <div class="input" style="grid-column: 1 / 9">                
-                <input id="buscarId"/>
-                    <label for="buscarId">ID</label>
-                    <label subtext>Ingresá un ID para buscar</label>
-                <div>${this.item.descripcion}</div>
-                <div>${this.item.id}</div>
+            <div class="inner-grid cabecera column">
+                <div></div>
+                <div class="grid center"><h2>ART</h2></div>
+                <div class="grid end">
+                    <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
+                </div>
             </div>
-            <button raised action
-            style="grid-column: 2 / 8; align-self: center"
-            @click="${this.buscarPorId}">Buscar por ID</button>
-        </div>
-            <!-- Buscar por Descripcion -->
-            <div class="inner-grid fit18">
-                <label style="grid-column: 1 / 4; align-self: center">Buscar por Descripcion</label>
 
-                    <div class="input" style="grid-column: 1 / 9">
-                        <input id="descripcion"/>
-                        <label for="descripcion">Descripción</label>
-                        <label subtext>Texto parcial o completo</label>
-                        <div>${this.itemByDescription.descripcion}</div>
-                        <div>${this.itemByDescription.id}</div>
+            <div class="contenedor inner-grid">
+                <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
+                    <div class="input">
+                        <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
                     </div>
-
-                <button raised
-                style="grid-column: 2 / 8; align-self: end"
-                @click ="${this.buscar}">Buscar Por Descripcion</button>
-                <button flat @click = "${this.modificar}" style="grid-column: 2 / 8">Modificar</button>  
+                    <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">${CHECK}</button>
+                </div>
+                ${this.artItems.map(
+                    (art) =>
+                        html` <div class="grid item" ultimoid="${art.id}" .art=${art} ?modificando=${art.modificando}>
+                            <div class="input">
+                                <input
+                                    class="grid center input-descripcion"
+                                    .value="${art.descripcion}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <button
+                                flat
+                                ?oculto="${!art.modificando}"
+                                @click="${(e) => {
+                                    this.editar(e, art);
+                                }}"
+                            >
+                                ${CHECK}
+                            </button>
+                            <button
+                                class="eliminable"
+                                flat
+                                ?oculto="${!art.modificando}"
+                                @click="${(e) => {
+                                    this.eliminar(e, art);
+                                }}"
+                            >
+                                ${DELETE}
+                            </button>
+                        </div>`
+                )}
             </div>
-                        <!-- AGREGAR -->
-            <div class="inner-grid fit18">
-                <label style="grid-column: 1 / 4; align-self: center">AGREGAR ART</label>
-
-                    <div class="input" style="grid-column: 1 / 9">
-                        <input id="agregar"/>
-                        <label for="agregar">Descripción</label>
-                        <label subtext>Agregar el nombre de la ART</label>
-                    </div>
-
-                <button raised
-                style="grid-column: 2 / 8; align-self: end"
-                @click ="${this.agregar}">AGREGAR</button>
-            </div>
-            <!-- Modificar -->
-            <div class="inner-grid fit18">               
-                <!-- Buscar Todos -->
-                <div style="grid-column: 4 / 7; align-self: center">ART Buscar TODOS </div>                                
-                <button link action @click ="${this.buscarTodos}" style="grid-column: 3 / 7">Buscar Todos</button>                
-            </div>        
-
-            <div class = "results-grid">
-                <div class="header">ID</div>
-                <div class="header">Descripción</div>
-                ${this.items?.map(
-                    (art) => html`
-                    <div>${art.id}</div>
-                    <div>${art.descripcion}</div>
-                ` )}
-            </div>
-            
         `;
+    }
+
+    agregarOCancelar() {
+        if (this.agregando || this.modificando) {
+            this.modificando = false;
+            this.agregando = false;
+
+            this.artItems.forEach((art) => {
+                art.modificando = false;
+            });
+
+            const art = this.artItems;
+            this.artItems = [];
+            this.update();
+            this.artItems = art;
+            this.update();
+            return;
+        }
+
+        this.agregando = true;
+        this.shadowRoot.querySelector("#ultimo")?.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline: "end",
+        });
+        this.shadowRoot.querySelector("#input-agregar").value = "";
+        this.update();
+    }
+
+    editando(e) {
+        let anterior = this.shadowRoot.querySelector("[modificando]");
+        if (anterior) anterior.artItems.modificando = false;
+
+        let padre = e.currentTarget.parentElement;
+        while (padre) {
+            if (padre.art) {
+                padre.art.modificando = true;
+                break;
+            } else {
+                padre = padre.parentElement;
+            }
+        }
+        this.modificando = true;
+        this.esEliminable = false;
+        this.update();
+    }
+
+    eliminar() {
+        alert("Eliminando");
     }
 
     agregar() {
         let descripcion = this.shadowRoot.querySelector("#agregar").value;
         let body = {
-            descripcion: descripcion
-        }
+            descripcion: descripcion,
+        };
         store.dispatch(addArt(body));
     }
 
-    modificar() {
-        let id = this.shadowRoot.querySelector("#buscarId").value;
-        let descripcion = this.shadowRoot.querySelector("#descripcion").value;
+    editar(e, art) {
+        this.artAddId = art.id;
+        let padre = e.currentTarget.parentElement;
         let body = {
-            id: id,
-            descripcion: descripcion
-        }
-        store.dispatch(updateArt(body))
-
+            id: art.id,
+            descripcion: padre.querySelector(".input-descripcion").value,
+        };
+        store.dispatch(updateArt(body));
     }
 
     buscar() {
         let descripcion = this.shadowRoot.querySelector("#descripcion").value;
-        store.dispatch(getByDescription(descripcion))
+        store.dispatch(getByDescription(descripcion));
     }
 
     buscarTodos() {
-        store.dispatch(getArt())
+        store.dispatch(getArt());
     }
 
     buscarPorId() {
         let id = this.shadowRoot.querySelector("#buscarId").value;
-        store.dispatch(getById(id))
+        store.dispatch(getById(id));
+    }
 
+    firstUpdated() {
+        this.buscarTodos();
     }
 
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
             this.hidden = true;
-            const isCurrentScreen = ["ART"].some(s => s == state.screen.name);
+            const isCurrentScreen = ["ART"].some((s) => s == state.screen.name);
             if (isInLayout(state, this.area) && isCurrentScreen) {
                 this.hidden = false;
             }
         }
 
         if (name == ART_ADD) {
-            this.buscarTodos()
+            this.buscarTodos();
         }
 
         if (name == ART_BY_ID) {
@@ -259,12 +299,32 @@ static get styles() {
             this.itemByDescription = state.art.byDescription.entityByDescription[0];
         }
         if (name == ART_ALL) {
-            this.items = state.art.entities;
+            this.artItems = state.art.entities;
+            this.update();
+            if (this.artAddId != null) {
+                let div = this.shadowRoot.querySelector('*[ultimoid="' + this.artAddId + '"]');
+                div?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
+                    inline: "end",
+                });
+                div.toggleAttribute("nuevo");
+                setTimeout(() => {
+                    div.toggleAttribute("nuevo");
+                }, 750);
+
+                this.artAddId = null;
+            }
         }
         if (name == ART_UPDATE) {
-            this.buscarTodos()
+            let retorno = state.art.updateArt.resultado;
+            if (retorno.StatusCode) {
+                store.dispatch(showAlert("Error ", retorno.Message));
+            } else {
+                this.buscarTodos();
+                this.agregarOCancelar();
+            }
         }
-
     }
 
     static get properties() {
@@ -272,6 +332,9 @@ static get styles() {
             hidden: {
                 type: Boolean,
                 reflect: true,
+            },
+            esEliminable: {
+                type: Boolean,
             },
             item: {
                 type: Object,
@@ -287,8 +350,7 @@ static get styles() {
             },
             area: {
                 type: String,
-            }
-
+            },
         };
     }
 }
