@@ -3,7 +3,7 @@
 import { html, LitElement, css } from "lit";
 import { store } from "../../redux/store";
 import { connect } from "@brunomon/helpers/connect";
-import { getArt, getByDescription, getById, updateArt, addArt } from "../../redux/art/actions";
+import { getArt, getByDescription, getById, updateArt, addArt, deleteArt } from "../../redux/art/actions";
 import { gridLayout } from "@brunomon/template-lit/src/views/css/gridLayout";
 import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
@@ -13,6 +13,7 @@ import { isInLayout } from "../../redux/screens/screenLayouts";
 import { showAlert, showError } from "../../redux/ui/actions";
 import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
+const ART_DELETE = "art.deleteArt.timeStamp";
 const ART_BY_ID = "art.byId.timeStamp";
 const ART_ADD = "art.addArt.timeStamp";
 const ART_BY_DESCRIPTION = "art.byDescription.timeStamp";
@@ -21,7 +22,7 @@ const ART_UPDATE = "art.updateArt.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
-export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE, ART_ADD)(LitElement) {
+export class MiComponente extends connect(store, ART_DELETE, MEDIA_CHANGE, SCREEN, ART_BY_ID, ART_BY_DESCRIPTION, ART_ALL, ART_UPDATE, ART_ADD)(LitElement) {
     constructor() {
         super();
         this.artAddId = null;
@@ -172,7 +173,7 @@ export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID
                                 flat
                                 ?oculto="${!art.modificando}"
                                 @click="${(e) => {
-                                    this.editar(e, art);
+                                    this.guardar(e, art);
                                 }}"
                             >
                                 ${CHECK}
@@ -222,7 +223,7 @@ export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID
 
     editando(e) {
         let anterior = this.shadowRoot.querySelector("[modificando]");
-        if (anterior) anterior.artItems.modificando = false;
+        if (anterior) anterior.art.modificando = false;
 
         let padre = e.currentTarget.parentElement;
         while (padre) {
@@ -238,20 +239,22 @@ export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID
         this.update();
     }
 
-    eliminar() {
-        alert("Eliminando");
+    eliminar(e) {
+        let padre = e.currentTarget.parentElement;
+        let id = padre.art.id;
+        store.dispatch(deleteArt(id));
+        this.update();
     }
 
     agregar() {
-        let descripcion = this.shadowRoot.querySelector("#agregar").value;
+        let descripcion = this.shadowRoot.querySelector("#input-agregar").value;
         let body = {
             descripcion: descripcion,
         };
         store.dispatch(addArt(body));
     }
 
-    editar(e, art) {
-        this.artAddId = art.id;
+    guardar(e, art) {
         let padre = e.currentTarget.parentElement;
         let body = {
             id: art.id,
@@ -289,6 +292,8 @@ export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID
         }
 
         if (name == ART_ADD) {
+            this.artAddId = state.art.addArt.addId;
+            this.agregarOCancelar();
             this.buscarTodos();
         }
 
@@ -324,6 +329,11 @@ export class MiComponente extends connect(store, MEDIA_CHANGE, SCREEN, ART_BY_ID
                 this.buscarTodos();
                 this.agregarOCancelar();
             }
+        }
+
+        if (name == ART_DELETE) {
+            this.agregarOCancelar();
+            this.buscarTodos();
         }
     }
 

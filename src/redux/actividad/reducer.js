@@ -10,7 +10,9 @@ import {
     ADD_ACTIVIDAD_ERROR,
     ADD_ACTIVIDAD_SUCCESS,
     UPDATE_ACTIVIDAD_ERROR,
-    UPDATE_ACTIVIDAD_SUCCESS
+    UPDATE_ACTIVIDAD_SUCCESS,
+    DELETE_ACTIVIDAD_ERROR,
+    DELETE_ACTIVIDAD_SUCCESS,
 } from "./actions";
 
 const initialState = {
@@ -21,24 +23,29 @@ const initialState = {
     byDescription: {
         entityByDescription: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     byId: {
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     addActividad: {
         addId: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     updateActividad: {
         resultado: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
+    },
+    deleteActividad: {
+        resultado: null,
+        timeStamp: null,
+        timeStampError: null,
     },
     entities: [],
-    entity: null
+    entity: null,
 };
 
 export const reducer = (state = initialState, action) => {
@@ -85,7 +92,13 @@ export const reducer = (state = initialState, action) => {
         case UPDATE_ACTIVIDAD_ERROR:
             newState.updateActividad.timeStampError = new Date().getTime();
             break;
-
+        case DELETE_ACTIVIDAD_SUCCESS:
+            newState.deleteActividad.timeStamp = new Date().getTime();
+            newState.deleteActividad.resultado = action.payload.receive;
+            break;
+        case DELETE_ACTIVIDAD_ERROR:
+            newState.deleteActividad.timeStampError = new Date().getTime();
+            break;
     }
     return newState;
 };

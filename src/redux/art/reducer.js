@@ -11,34 +11,41 @@ import {
     ADD_ART_SUCCESS,
     UPDATE_ART_ERROR,
     UPDATE_ART_SUCCESS,
+    DELETE_ART_ERROR,
+    DELETE_ART_SUCCESS,
 } from "./actions";
 
 const initialState = {
     all: {
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     byDescription: {
         entityByDescription: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     byId: {
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     addArt: {
         addId: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
     },
     updateArt: {
         resultado: null,
         timeStamp: null,
-        timeStampError: null
+        timeStampError: null,
+    },
+    deleteArt: {
+        resultado: null,
+        timeStamp: null,
+        timeStampError: null,
     },
     entities: [],
-    entity: null
+    entity: null,
 };
 
 export const reducer = (state = initialState, action) => {
@@ -81,10 +88,17 @@ export const reducer = (state = initialState, action) => {
             break;
         case UPDATE_ART_SUCCESS:
             newState.updateArt.timeStamp = new Date().getTime();
-            newState.resultado = action.payload.receive;
+            newState.updateArt.resultado = action.payload.receive;
             break;
         case UPDATE_ART_ERROR:
             newState.updateArt.timeStampError = new Date().getTime();
+            break;
+        case DELETE_ART_SUCCESS:
+            newState.deleteArt.timeStamp = new Date().getTime();
+            newState.deleteArt.resultado = action.payload.receive;
+            break;
+        case DELETE_ART_ERROR:
+            newState.deleteArt.timeStampError = new Date().getTime();
             break;
     }
     return newState;

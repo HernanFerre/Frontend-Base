@@ -8,11 +8,12 @@ import { input } from "@brunomon/template-lit/src/views/css/input";
 import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
-import { getActividades, getByDescription, getById, updateActividad, addActividad } from "../../redux/actividad/actions";
+import { getActividades, getByDescription, getById, updateActividad, addActividad, deleteActividad } from "../../redux/actividad/actions";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 import { showAlert, showError } from "../../redux/ui/actions";
 import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
+const ACTIVIDADES_DELETE = "actividad.deleteActividad.timeStamp";
 const ACTIVIDADES_ADD = "actividad.addActividad.timeStamp";
 const ACTIVIDADES_ALL = "actividad.all.timeStamp";
 const ACTIVIDADES_BY_DESCRIPTION = "actividad.byDescription.timeStamp";
@@ -21,10 +22,19 @@ const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
-export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDIA_CHANGE, ACTIVIDADES_ALL, ACTIVIDADES_BY_DESCRIPTION, ACTIVIDADES_BY_ID, ACTIVIDADES_UPDATE)(LitElement) {
+export class MisActividades extends connect(
+    store,
+    ACTIVIDADES_DELETE,
+    ACTIVIDADES_ADD,
+    SCREEN,
+    MEDIA_CHANGE,
+    ACTIVIDADES_ALL,
+    ACTIVIDADES_BY_DESCRIPTION,
+    ACTIVIDADES_BY_ID,
+    ACTIVIDADES_UPDATE
+)(LitElement) {
     constructor() {
         super();
-        // this.hidden = false;
         this.actividadAddId = null;
         this.item = {};
         this.itemByDescription = {};
@@ -240,8 +250,11 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
         this.update();
     }
 
-    eliminar() {
-        alert("Eliminando");
+    eliminar(e) {
+        let padre = e.currentTarget.parentElement;
+        let id = padre.actividad.id;
+        store.dispatch(deleteActividad(id));
+        this.update();
     }
 
     agregar() {
@@ -326,6 +339,11 @@ export class MisActividades extends connect(store, ACTIVIDADES_ADD, SCREEN, MEDI
 
         if (name == ACTIVIDADES_ADD) {
             this.actividadAddId = state.actividad.addActividad.addId;
+            this.agregarOCancelar();
+            this.buscarTodos();
+        }
+
+        if (name == ACTIVIDADES_DELETE) {
             this.agregarOCancelar();
             this.buscarTodos();
         }

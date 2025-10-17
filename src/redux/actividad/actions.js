@@ -18,7 +18,11 @@ export const ADD_ACTIVIDAD_ERROR = "[actividad] add actividad error";
 
 export const UPDATE_ACTIVIDAD = "[actividad] update actividad";
 export const UPDATE_ACTIVIDAD_SUCCESS = "[actividad] update actividad success";
-export const UPDATE_ACTIVIDAD_ERROR = "[actividad] update actividad error"
+export const UPDATE_ACTIVIDAD_ERROR = "[actividad] update actividad error";
+
+export const DELETE_ACTIVIDAD = "[actividad] delete actividad";
+export const DELETE_ACTIVIDAD_SUCCESS = "[actividad] delete actividad success";
+export const DELETE_ACTIVIDAD_ERROR = "[actividad] delete actividad error";
 
 export const getActividades = () => ({
     type: GET_ACTIVIDADES,
@@ -26,20 +30,25 @@ export const getActividades = () => ({
 
 export const getByDescription = (descripcion) => ({
     type: GET_BY_DESCRIPTION,
-    descripcion: descripcion
+    descripcion: descripcion,
 });
 
 export const getById = (id) => ({
     type: GET_BY_ID,
-    id: id
-})
+    id: id,
+});
 
 export const addActividad = (body) => ({
     type: ADD_ACTIVIDAD,
-    body: body
-})
+    body: body,
+});
 
 export const updateActividad = (body) => ({
     type: UPDATE_ACTIVIDAD,
-    body: body
-})
+    body: body,
+});
+
+export const deleteActividad = (id) => ({
+    type: DELETE_ACTIVIDAD,
+    id: id,
+});
