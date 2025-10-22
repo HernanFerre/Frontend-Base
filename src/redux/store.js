@@ -11,10 +11,11 @@ import { middleware as route } from "./routing/middleware";
 import { middleware as actividad } from "./actividad/middleware";
 import { middleware as art } from "./art/middleware";
 import { middleware as relevador } from "./relevador/middleware";
+import { middleware as empresa } from "./empresa/middleware";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-let mdw = [api, rest, ...ui, ...route, ...autorizacion, ...actividad, ...art, ...relevador];
+let mdw = [api, rest, ...ui, ...route, ...autorizacion, ...actividad, ...art, ...relevador, ...empresa];
 
 if (process.env.NODE_ENV !== "production") {
     mdw = [...mdw, logger];

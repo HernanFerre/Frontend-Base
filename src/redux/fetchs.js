@@ -29,3 +29,7 @@ export const actividadDeleteFetch = fetchFactory(webApi, "Actividad/Quitar");
 export const relevadorGetAllFetch = fetchFactory(webApi, "Relevador/All");
 export const relevadorByIdFetch = fetchFactory(webApi, "Relevador/GetById");
 export const relevadorByUserIdFetch = fetchFactory(webApi, "Relevador/GetByUserId");
+export const getEmpresasFetch = fetchFactory(webApi, "Empresa/All");
+export const addEmpresaFetch = fetchFactory(webApi, "Empresa/Add");
+export const updateEmpresaFetch = fetchFactory(webApi, "Empresa/Update");
+export const deleteEmpresaFetch = fetchFactory(webApi, "Empresa/Quitar");

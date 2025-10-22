@@ -9,6 +9,7 @@ import { reducer as miPerfilReducer } from "./miPerfil/reducer";
 import { reducer as actividadesReducer } from "./actividad/reducer";
 import { reducer as artReducer } from "./art/reducer";
 import { reducer as relevadorReducer } from "./relevador/reducer";
+import { reducer as empresasReducer } from "./empresa/reducer";
 
 export const rootReducer = (state = {}, action) => {
     const presentacionesEstadosRed = state.presentacionesEstados;
@@ -22,5 +23,6 @@ export const rootReducer = (state = {}, action) => {
         actividad: actividadesReducer(state.actividad, action),
         art: artReducer(state.art, action),
         relevador: relevadorReducer(state.relevador, action),
+        empresa: empresasReducer(state.empresa, action),
     };
 };

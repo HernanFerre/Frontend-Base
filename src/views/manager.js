@@ -13,6 +13,7 @@ import { gridLayout } from "@brunomon/template-lit/src/views/css/gridLayout";
 import { MiComponente } from "./componentes/miComponente";
 import { MisActividades } from "./componentes/misActividades";
 import { MisRelevadores } from "./componentes/misRelevadores";
+import { compEmpresas } from "./componentes/compEmpresas";
 
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
@@ -65,6 +66,7 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
             <div class="spinner" anillo fixed hidden></div>
             <menu-principal area="header"></menu-principal>
             <form-test></form-test>
+            <comp-empresas></comp-empresas>
             <mi-componente></mi-componente>
             <mis-actividades></mis-actividades>
             <mis-relevadores></mis-relevadores>
