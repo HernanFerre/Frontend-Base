@@ -10,242 +10,389 @@ import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 import { getRelevador, getRelevadorById, getRelevadorByUserId } from "../../redux/relevador/actions";
+import { showAlert, showError } from "../../redux/ui/actions";
+import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
-const RELEVADOR_BY_USER_ID = "relevador.byUserId.timeStamp";
-const RELEVADOR_BY_ID = "relevador.byId.timeStamp";
 const RELEVADOR_GET_ALL = "relevador.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 
-
-export class MisRelevadores extends connect(store,RELEVADOR_BY_USER_ID, RELEVADOR_BY_ID, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
+export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
     constructor() {
         super();
-        this.hidden = false;
+        this.relevadorId = null;
+        this.userId = null;
         this.item = {};
         this.itemByDescription = {};
-        this.items = [];
+        this.relevadores = [];
         this.mediaSize = null;
         this.area = "body";
     }
 
     static get styles() {
         return css`
-        ${gridLayout}
-        ${input}
-        ${select}
-        ${check}
-        ${button}
+            ${gridLayout}
+            ${input}
+            ${select}
+            ${check}
+            ${button}
 
-        :host {
-            display: grid;
-            grid-auto-flow: row;
-            background-color: var(--formulario);
-            padding: 2rem;
-            grid-gap: 1rem;
-            overflow-y: scroll;
-        }
-        .inner-grid.fit18 {
-            display: grid;
-            grid-template-columns: repeat(18, minmax(0, 1fr));
-            gap: 1rem;                /* separa columnas/filas */
-            align-items: end;         /* botones e inputs al mismo “renglón” */
-            margin-bottom: 1.25rem;   /* separa bloques entre sí */
-            }
-
-            /* Altura consistente entre inputs y botones */
-            input,
-            select,
-            textarea {
-            height: 40px;
-            padding: 0 .75rem;
-            line-height: 40px;
-            border-radius: 10px;
-            }
-            button {
-            height: 40px;
-            padding: 0 1rem;
-            align-self: end; /* se alinea con el borde inferior del input */
+            :host {
+                background-color: var(--formulario);
+                grid-auto-flow: row;
+                border-radius: 0.5rem 0.5rem 0 0;
+                box-shadow: var(--shadow-elevation-3-box);
+                grid-gap: 0 !important;
+                grid-template-rows: auto 1fr;
+                place-self: center;
+                --ancho-id: 12rem;
+                --ancho-email: 12rem;
+                --ancho-nombre: 8rem;
+                --ancho-apellido: 8rem;
+                --ancho-usuarioid: 12rem;
+                --ancho-departamento: 6rem;
+                --ancho-nombreusuario: 6rem;
+                --ancho-boton: 3rem;
             }
 
-            /* Labels y subtext más legibles y compactos */
-            .input > label:not([subtext]) {
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
-            margin-bottom: .35rem;
-            display: inline-block;
+            :host([hidden]) {
+                display: none;
             }
-            .input > label[subtext] {
-            font-size: .75rem;
-            opacity: .75;
-            margin-top: .35rem;
-            display: block;
+            *[hidden] {
+                display: none;
             }
-
-            /* Título y bloques generales */
-            h1 {
-            margin: 0 0 1rem 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--on-formulario, #eaeaea);
+            *[oculto] {
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                opacity: 0;
+                z-index: -10;
             }
 
-            /* Texto (como tus resultados individuales) más nítido */
-            div {
-            color: var(--on-formulario, #e6e6e6);
+            .cabecera {
+                color: var(--on-formulario-bajada);
+                grid-template-columns: 0.5fr 1fr 0.5fr;
+                border-bottom: 1px solid var(--velo);
             }
-            .results-grid .header:nth-child(1),
-            .results-grid .header:nth-child(2),
-            .results-grid .header:nth-child(3),
-            .results-grid .header:nth-child(4),
-            .results-grid .header:nth-child(5),
-            .results-grid .header:nth-child(6),
-            .results-grid .header:nth-child(7) {
-                margin-bottom: 0.5rem; /* separa visualmente header de filas */
-                border-bottom: 2px solid var(--primary-color, #2196f3);
-                padding-bottom: 0.4rem;
+            .contenedor {
+                color: var(--on-formulario);
+                height: 65vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                gap: 0;
+            }
+            .contenedor::-webkit-scrollbar {
+                width: 0.5rem;
+                height: 0.5rem;
+            }
+            .contenedor::-webkit-scrollbar-thumb {
+                background: var(--secundario10);
+                border-radius: 4px;
+            }
+            .contenedor::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+            }
+            .cabecera div button {
+                padding: 0.25rem;
+                width: 2.75rem;
+            }
+            .item {
+                height: 3rem;
+                transition: 0.5s ease;
+                overflow: none;
+                grid-template-columns: var(--ancho-id) var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-usuarioid) var(--ancho-departamento) var(--ancho-nombreusuario) 0 0;
+                grid-gap: 0.5rem;
+            }
+            .item[modificando] {
+                grid-template-columns:
+                    var(--ancho-id) var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-usuarioid) var(--ancho-departamento) var(--ancho-nombreusuario) var(--ancho-boton)
+                    var(--ancho-boton);
+                grid-gap: 0.5rem;
+            }
+            .item button {
+                width: var(--ancho-boton);
+                padding: 0.25rem;
+            }
+            button[flat] svg {
+                fill: var(--primario);
+            }
+            button[flat]:hover svg {
+                fill: var(--on-primario);
+            }
+            button[flat]:focus svg {
+                fill: var(--on-primario);
             }
 
-            .results-grid{
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-                column-gap: .75rem;
-                row-gap: 0;
-                align-items: center;
-                margin-top: 1rem;
+            select[disabled] {
+                opacity: 1 !important;
+                cursor: inherit;
+                background-image: none !important;
             }
-
-            .results-grid .header {
-                font-weight: 600;
-                background-color: rgba(255, 255, 255, 0.1);
-                padding: 0.5rem;
-                border-bottom: 2px solid var(--primary-color,#2196f3 );
-                
+            .cabecera button svg {
+                transition: 0.3s;
             }
-
-            .results-grid > div:not(.headere) {
-                padding: 0.4rem 0.5rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            button[cancelar] {
+                background-color: var(--error) !important;
             }
-
-            .results-grid > div:not(.header):nth-child(14n + 8),
-            .results-grid > div:not(.header):nth-child(14n + 9),
-            .results-grid > div:not(.header):nth-child(14n + 10),
-            .results-grid > div:not(.header):nth-child(14n + 11),
-            .results-grid > div:not(.header):nth-child(14n + 12),
-            .results-grid > div:not(.header):nth-child(14n + 13),
-            .results-grid > div:not(.header):nth-child(14n + 14) {
-            background-color: rgba(255, 255, 255, 0.04);
+            button[cancelar] svg {
+                transform: rotate(45deg);
             }
-            
+            .item[nuevo] {
+                opacity: 0.3;
+            }
         `;
     }
 
     render() {
         return html`
-            <!-- Buscar por ID -->
-            <div>
-                <h1>RELEVADORES</h1>
-            </div>
-            <!-- Buscar por ID -->
-            <div class="inner-grid fit18">
-                <div class="input" style="grid-column: 1 / 9">                
-                    <input id="buscarId"/>
-                        <label for="buscarId">ID</label>
-                        <label subtext>Ingresá un ID para buscar</label>
-                    <div>${this.item.nombre}</div>
-                    <div>${this.item.apellido}</div>
-                    <div>${this.item.id}</div>
+            <div class="inner-grid fit-10 cabecera column">
+                <div></div>
+                <div class="grid center"><h2>Relevadores</h2></div>
+                <div class="grid end">
+                    <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
                 </div>
-                <button raised action
-                style="grid-column: 2 / 8; align-self: center"
-                @click="${this.buscarPorId}">Buscar por ID</button>
             </div>
 
-            <!-- Buscar por User ID -->
-            <div class="inner-grid fit18">
-                <div class="input" style="grid-column: 1 / 9">                
-                    <input id="buscarUserId"/>
-                        <label for="buscarUserId">USER ID</label>
-                        <label subtext>Ingresá un ID de Usuario para buscar</label>
-                    <div>${this.item.nombre}</div>
-                    <div>${this.item.apellido}</div>
-                    <div>${this.item.id}</div>
-                </div>
-                <button raised action
-                style="grid-column: 2 / 8; align-self: center"
-                @click="${this.buscarPorUserId}">Buscar por User ID</button>
-            </div>
-
-            <!-- Buscar Todos -->
-            <div class="inner-grid fit18">
-                <div style="grid-column: 3 / 7; align-self: center">Buscar Todos los Relevadores
-                <button link action @click ="${this.buscarTodos}" style="grid-column: 5 / 8">Buscar Todos</button>
-                </div>
-                <div style="grid-column: 1 / 18">   
-                    <div class = "results-grid">
-                        <div class="header">ID</div>
-                        <div class="header">email</div>
-                        <div class="header">Nombre</div>
-                        <div class="header">ID Usuario</div>
-                        <div class="header">Apellido</div>
-                        <div class="header">Departamento</div>
-                        <div class="header">Nombre De Usuario</div>
-                        ${this.items?.map(
-                            (relevador) => html`
-                            <div>${relevador.id}</div>
-                            <div>${relevador.email}</div>
-                            <div>${relevador.nombre}</div>
-                            <div>${relevador.usuarioId}</div>
-                            <div>${relevador.apellido}</div>
-                            <div>${relevador.departamento}</div>
-                            <div>${relevador.nombreDeUsuario}</div>
-                        ` )}
+            <div class="contenedor fit-10 grid">
+                <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
+                    <div class="input">
+                        <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
                     </div>
+                    <button flat ?oculto="${this.agrengado}" @click="${this.agregar}">${CHECK}</button>
                 </div>
+                ${this.relevadores.map(
+                    (relevador) =>
+                        html` <div class="grid item" ultimoid="${relevador.id}" .relevador=${relevador} ?modificando=${relevador.modificando}>
+                            <div class="input">
+                                <input
+                                    .value="${relevador.id}"
+                                    class="grid item"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    .value="${relevador.email}"
+                                    class="grid item"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    .value="${relevador.nombre}"
+                                    class="grid item"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    class="grid item"
+                                    .value="${relevador.apellido}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    class="grid item"
+                                    .value="${relevador.usuarioId}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    class="grid item"
+                                    .value="${relevador.departamento}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <div class="input">
+                                <input
+                                    class="grid item"
+                                    .value="${relevador.nombreDeUsuario}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <button
+                                flat
+                                ?oculto="${!relevador.modificando}"
+                                @click="${(e) => {
+                                    this.guardar(e, relevador);
+                                }}"
+                            >
+                                ${CHECK}
+                            </button>
+                            <button
+                                class="eliminable"
+                                flat
+                                ?oculto="${!relevador.modificando}"
+                                @click="${(e) => {
+                                    this.eliminar(e, relevador);
+                                }}"
+                            >
+                                ${DELETE}
+                            </button>
+                        </div>`
+                )}
             </div>
-            
-
         `;
+
+        // return html`
+
+        //     <div>
+        //         <h1>RELEVADORES</h1>
+        //     </div>
+
+        //     <div class="inner-grid fit18">
+        //         <div class="input" style="grid-column: 1 / 9">
+        //             <input id="buscarId" />
+        //             <label for="buscarId">ID</label>
+        //             <label subtext>Ingresá un ID para buscar</label>
+        //             <div>${this.item.nombre}</div>
+        //             <div>${this.item.apellido}</div>
+        //             <div>${this.item.id}</div>
+        //         </div>
+        //         <button raised action style="grid-column: 2 / 8; align-self: center" @click="${this.buscarPorId}">Buscar por ID</button>
+        //     </div>
+
+        //     <div class="inner-grid fit18">
+        //         <div class="input" style="grid-column: 1 / 9">
+        //             <input id="buscarUserId" />
+        //             <label for="buscarUserId">USER ID</label>
+        //             <label subtext>Ingresá un ID de Usuario para buscar</label>
+        //             <div>${this.item.nombre}</div>
+        //             <div>${this.item.apellido}</div>
+        //             <div>${this.item.id}</div>
+        //         </div>
+        //         <button raised action style="grid-column: 2 / 8; align-self: center" @click="${this.buscarPorUserId}">Buscar por User ID</button>
+        //     </div>
+
+        //     <div class="inner-grid fit18">
+        //         <div style="grid-column: 3 / 7; align-self: center">
+        //             Buscar Todos los Relevadores
+        //             <button link action @click="${this.buscarTodos}" style="grid-column: 5 / 8">Buscar Todos</button>
+        //         </div>
+        //         <div style="grid-column: 1 / 18">
+        //             <div class="results-grid">
+        //                 <div class="header">ID</div>
+        //                 <div class="header">email</div>
+        //                 <div class="header">Nombre</div>
+        //                 <div class="header">ID Usuario</div>
+        //                 <div class="header">Apellido</div>
+        //                 <div class="header">Departamento</div>
+        //                 <div class="header">Nombre De Usuario</div>
+        //                 ${this.items?.map(
+        //                     (relevador) => html`
+        //                         <div>${relevador.id}</div>
+        //                         <div>${relevador.email}</div>
+        //                         <div>${relevador.nombre}</div>
+        //                         <div>${relevador.usuarioId}</div>
+        //                         <div>${relevador.apellido}</div>
+        //                         <div>${relevador.departamento}</div>
+        //                         <div>${relevador.nombreDeUsuario}</div>
+        //                     `
+        //                 )}
+        //             </div>
+        //         </div>
+        //     </div>
+        // `;
+    }
+
+    agregarOCancelar() {
+        if (this.agregando || this.modificando) {
+            this.modificando = false;
+            this.agregando = false;
+
+            this.relevadores.forEach((relevador) => {
+                relevador.modificando = false;
+            });
+
+            const relevador = this.relevadores;
+            this.relevadores = [];
+            this.update();
+            this.relevadores = relevador;
+            this.update();
+            return;
+        }
+
+        this.agregando = true;
+        this.shadowRoot.querySelector("#ultimo")?.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline: "end",
+        });
+        this.shadowRoot.querySelector("#input-agregar").value = "";
+        this.update();
+    }
+
+    editando(e) {
+        let anterior = this.shadowRoot.querySelector("[modificando]");
+        if (anterior) anterior.relevador.modificando = false;
+
+        let padre = e.currentTarget.parentElement;
+        while (padre) {
+            if (padre.relevador) {
+                padre.relevador.modificando = true;
+                break;
+            } else {
+                padre = padre.parentElement;
+            }
+        }
+        this.modificando = true;
+        this.esEliminable = false;
+        this.update();
+    }
+
+    firstUpdated() {
+        this.buscarTodos();
     }
 
     buscarTodos() {
-        store.dispatch(getRelevador())
-    }
-
-    buscarPorId() {
-        let id = this.shadowRoot.querySelector("#buscarId").value;
-        store.dispatch(getRelevadorById(id));
-    }
-
-    buscarPorUserId() {
-        let userId = this.shadowRoot.querySelector("#buscarUserId").value;
-        store.dispatch(getRelevadorByUserId(userId));
+        store.dispatch(getRelevador());
     }
 
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
             this.hidden = true;
-            const isCurrentScreen = ["Relevadores"].some(s => s == state.screen.name);
+            const isCurrentScreen = ["Relevadores"].some((s) => s == state.screen.name);
             if (isInLayout(state, this.area) && isCurrentScreen) {
                 this.hidden = false;
             }
         }
 
         if (name == RELEVADOR_GET_ALL) {
-            this.items = state.relevador.entities;
+            this.relevadores = state.relevador.entities;
+            this.update();
+            if (this.relevadorId != null) {
+                let div = this.shadowRoot.querySelector('*[ultimoid="' + this.relevadorId + '"]');
+                div?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
+                    inline: "end",
+                });
+                div.toggleAttribute("nuevo");
+                setTimeout(() => {
+                    div.toggleAttribute("nuevo");
+                }, 750);
+
+                this.relevadorId = null;
+            }
         }
-
-        if (name == RELEVADOR_BY_ID) {
-            this.item = state.relevador.entity;
-        }
-
-        if (name == RELEVADOR_BY_USER_ID) {
-            this.item = state.relevador.entity;
-        }
-
-
     }
 
     static get properties() {
@@ -260,7 +407,7 @@ export class MisRelevadores extends connect(store,RELEVADOR_BY_USER_ID, RELEVADO
             itemByDescription: {
                 type: Object,
             },
-            items: {
+            relevadores: {
                 type: Array,
             },
             mediaSize: {
@@ -268,8 +415,7 @@ export class MisRelevadores extends connect(store,RELEVADOR_BY_USER_ID, RELEVADO
             },
             area: {
                 type: String,
-            }
-
+            },
         };
     }
 }
