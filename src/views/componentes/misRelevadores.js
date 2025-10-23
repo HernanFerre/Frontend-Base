@@ -13,11 +13,14 @@ import { getRelevador, getRelevadorById, getRelevadorByUserId } from "../../redu
 import { showAlert, showError } from "../../redux/ui/actions";
 import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
 
+import { Validable } from "../../../src/libs/mixin/validable";
+
 const RELEVADOR_GET_ALL = "relevador.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
+const EDITAR_RELEVADOR = "relevador.byId.timeStamp";
 
-export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
+export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement)) {
     constructor() {
         super();
         this.relevadorId = null;
@@ -173,7 +176,7 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                                     }}"
                                 />
                             </div>
-                            <div class="input">
+                            <div class="input" ?error=${this.item.validables.email?.invalid}>
                                 <input
                                     .value="${relevador.email}"
                                     class="grid item"
@@ -181,6 +184,7 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                                         this.editando(e);
                                     }}"
                                 />
+                                <label error>No puede ser vacio</label>
                             </div>
                             <div class="input">
                                 <input
@@ -250,66 +254,20 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                 )}
             </div>
         `;
+    }
 
-        // return html`
-
-        //     <div>
-        //         <h1>RELEVADORES</h1>
-        //     </div>
-
-        //     <div class="inner-grid fit18">
-        //         <div class="input" style="grid-column: 1 / 9">
-        //             <input id="buscarId" />
-        //             <label for="buscarId">ID</label>
-        //             <label subtext>Ingresá un ID para buscar</label>
-        //             <div>${this.item.nombre}</div>
-        //             <div>${this.item.apellido}</div>
-        //             <div>${this.item.id}</div>
-        //         </div>
-        //         <button raised action style="grid-column: 2 / 8; align-self: center" @click="${this.buscarPorId}">Buscar por ID</button>
-        //     </div>
-
-        //     <div class="inner-grid fit18">
-        //         <div class="input" style="grid-column: 1 / 9">
-        //             <input id="buscarUserId" />
-        //             <label for="buscarUserId">USER ID</label>
-        //             <label subtext>Ingresá un ID de Usuario para buscar</label>
-        //             <div>${this.item.nombre}</div>
-        //             <div>${this.item.apellido}</div>
-        //             <div>${this.item.id}</div>
-        //         </div>
-        //         <button raised action style="grid-column: 2 / 8; align-self: center" @click="${this.buscarPorUserId}">Buscar por User ID</button>
-        //     </div>
-
-        //     <div class="inner-grid fit18">
-        //         <div style="grid-column: 3 / 7; align-self: center">
-        //             Buscar Todos los Relevadores
-        //             <button link action @click="${this.buscarTodos}" style="grid-column: 5 / 8">Buscar Todos</button>
-        //         </div>
-        //         <div style="grid-column: 1 / 18">
-        //             <div class="results-grid">
-        //                 <div class="header">ID</div>
-        //                 <div class="header">email</div>
-        //                 <div class="header">Nombre</div>
-        //                 <div class="header">ID Usuario</div>
-        //                 <div class="header">Apellido</div>
-        //                 <div class="header">Departamento</div>
-        //                 <div class="header">Nombre De Usuario</div>
-        //                 ${this.items?.map(
-        //                     (relevador) => html`
-        //                         <div>${relevador.id}</div>
-        //                         <div>${relevador.email}</div>
-        //                         <div>${relevador.nombre}</div>
-        //                         <div>${relevador.usuarioId}</div>
-        //                         <div>${relevador.apellido}</div>
-        //                         <div>${relevador.departamento}</div>
-        //                         <div>${relevador.nombreDeUsuario}</div>
-        //                     `
-        //                 )}
-        //             </div>
-        //         </div>
-        //     </div>
-        // `;
+    editar(e, relevador) {
+        this.relevador.validables = {
+            email: {
+                invalid: false,
+                isInvalid: (valor) => {
+                    return valor === "";
+                },
+            },
+        };
+        if (!isInvalid) {
+            showAlert("Guardado");
+        }
     }
 
     agregarOCancelar() {
@@ -392,6 +350,9 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
 
                 this.relevadorId = null;
             }
+        }
+
+        if (name == EDITAR_RELEVADOR) {
         }
     }
 
