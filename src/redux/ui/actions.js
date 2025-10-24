@@ -19,6 +19,20 @@ export const STEP = "[ui] step";
 export const SHOW_ALERT = "[ui] show alert";
 export const SHOW_CONFIRM = "[ui] show confirm";
 
+export const EDITAR_RELEVADOR = "[ui] editar relevador";
+
+export const AGREGAR_RELEVADOR = "[ui] agregar relevador";
+
+export const agregarRelevador = (body) => ({
+    type: AGREGAR_RELEVADOR,
+    body: body,
+});
+
+export const editarRelevador = (body) => ({
+    type: EDITAR_RELEVADOR,
+    body: body,
+});
+
 export const showSpinner = () => ({
     type: SHOW_SPINNER,
 });

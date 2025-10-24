@@ -10,17 +10,15 @@ import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
 import { getRelevador, getRelevadorById, getRelevadorByUserId } from "../../redux/relevador/actions";
-import { showAlert, showError } from "../../redux/ui/actions";
-import { CANCELAR, CHECK, MAS, DELETE } from "../../../assets/icons/svgs";
-
-import { Validable } from "../../../src/libs/mixin/validable";
+import { agregarRelevador, editarRelevador, showAlert, showError } from "../../redux/ui/actions";
+import { CANCELAR, CHECK, MAS, DELETE, MODIF } from "../../../assets/icons/svgs";
 
 const RELEVADOR_GET_ALL = "relevador.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 const EDITAR_RELEVADOR = "relevador.byId.timeStamp";
 
-export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement)) {
+export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
     constructor() {
         super();
         this.relevadorId = null;
@@ -48,11 +46,10 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
                 grid-gap: 0 !important;
                 grid-template-rows: auto 1fr;
                 place-self: center;
-                --ancho-id: 12rem;
+
                 --ancho-email: 12rem;
                 --ancho-nombre: 8rem;
                 --ancho-apellido: 8rem;
-                --ancho-usuarioid: 12rem;
                 --ancho-departamento: 6rem;
                 --ancho-nombreusuario: 6rem;
                 --ancho-boton: 3rem;
@@ -82,7 +79,9 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
                 height: 65vh;
                 overflow-y: auto;
                 overflow-x: hidden;
-                gap: 0;
+                background-color: var(--aplicacion);
+                padding: 0;
+                gap: 0.1rem;
             }
             .contenedor::-webkit-scrollbar {
                 width: 0.5rem;
@@ -104,12 +103,13 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
                 height: 3rem;
                 transition: 0.5s ease;
                 overflow: none;
-                grid-template-columns: var(--ancho-id) var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-usuarioid) var(--ancho-departamento) var(--ancho-nombreusuario) 0 0;
+                grid-template-columns: var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-departamento) var(--ancho-nombreusuario) var(--ancho-boton);
                 grid-gap: 0.5rem;
+                background-color: var(--formulario);
             }
             .item[modificando] {
                 grid-template-columns:
-                    var(--ancho-id) var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-usuarioid) var(--ancho-departamento) var(--ancho-nombreusuario) var(--ancho-boton)
+                    var(--ancho-email) var(--ancho-nombre) var(--ancho-apellido) var(--ancho-departamento) var(--ancho-nombreusuario) var(--ancho-boton)
                     var(--ancho-boton);
                 grid-gap: 0.5rem;
             }
@@ -153,7 +153,14 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
                 <div></div>
                 <div class="grid center"><h2>Relevadores</h2></div>
                 <div class="grid end">
-                    <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
+                    <button
+                        raised
+                        @click="${(e) => {
+                            this.addRelevador();
+                        }}"
+                    >
+                        ${MAS}
+                    </button>
                 </div>
             </div>
 
@@ -167,78 +174,18 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
                 ${this.relevadores.map(
                     (relevador) =>
                         html` <div class="grid item" ultimoid="${relevador.id}" .relevador=${relevador} ?modificando=${relevador.modificando}>
-                            <div class="input">
-                                <input
-                                    .value="${relevador.id}"
-                                    class="grid item"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
-                            <div class="input" ?error=${this.item.validables.email?.invalid}>
-                                <input
-                                    .value="${relevador.email}"
-                                    class="grid item"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                                <label error>No puede ser vacio</label>
-                            </div>
-                            <div class="input">
-                                <input
-                                    .value="${relevador.nombre}"
-                                    class="grid item"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
-                            <div class="input">
-                                <input
-                                    class="grid item"
-                                    .value="${relevador.apellido}"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
-                            <div class="input">
-                                <input
-                                    class="grid item"
-                                    .value="${relevador.usuarioId}"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
-                            <div class="input">
-                                <input
-                                    class="grid item"
-                                    .value="${relevador.departamento}"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
-                            <div class="input">
-                                <input
-                                    class="grid item"
-                                    .value="${relevador.nombreDeUsuario}"
-                                    @input="${(e) => {
-                                        this.editando(e);
-                                    }}"
-                                />
-                            </div>
+                            <div>${relevador.email}</div>
+                            <div>${relevador.nombre}</div>
+                            <div>${relevador.apellido}</div>
+                            <div>${relevador.departamento}</div>
+                            <div>${relevador.nombreDeUsuario}</div>
                             <button
                                 flat
-                                ?oculto="${!relevador.modificando}"
                                 @click="${(e) => {
-                                    this.guardar(e, relevador);
+                                    this.editar(e, relevador);
                                 }}"
                             >
-                                ${CHECK}
+                                ${MODIF}
                             </button>
                             <button
                                 class="eliminable"
@@ -257,62 +204,10 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
     }
 
     editar(e, relevador) {
-        this.relevador.validables = {
-            email: {
-                invalid: false,
-                isInvalid: (valor) => {
-                    return valor === "";
-                },
-            },
-        };
-        if (!isInvalid) {
-            showAlert("Guardado");
-        }
+        store.dispatch(editarRelevador(relevador));
     }
-
-    agregarOCancelar() {
-        if (this.agregando || this.modificando) {
-            this.modificando = false;
-            this.agregando = false;
-
-            this.relevadores.forEach((relevador) => {
-                relevador.modificando = false;
-            });
-
-            const relevador = this.relevadores;
-            this.relevadores = [];
-            this.update();
-            this.relevadores = relevador;
-            this.update();
-            return;
-        }
-
-        this.agregando = true;
-        this.shadowRoot.querySelector("#ultimo")?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-            inline: "end",
-        });
-        this.shadowRoot.querySelector("#input-agregar").value = "";
-        this.update();
-    }
-
-    editando(e) {
-        let anterior = this.shadowRoot.querySelector("[modificando]");
-        if (anterior) anterior.relevador.modificando = false;
-
-        let padre = e.currentTarget.parentElement;
-        while (padre) {
-            if (padre.relevador) {
-                padre.relevador.modificando = true;
-                break;
-            } else {
-                padre = padre.parentElement;
-            }
-        }
-        this.modificando = true;
-        this.esEliminable = false;
-        this.update();
+    addRelevador() {
+        store.dispatch(agregarRelevador({ apellido: "", nombre: "", email: "" }));
     }
 
     firstUpdated() {
@@ -350,9 +245,6 @@ export class MisRelevadores extends Validable(connect(store, RELEVADOR_GET_ALL, 
 
                 this.relevadorId = null;
             }
-        }
-
-        if (name == EDITAR_RELEVADOR) {
         }
     }
 

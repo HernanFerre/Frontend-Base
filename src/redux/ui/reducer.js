@@ -1,6 +1,6 @@
 /** @format */
 
-import { SHOW_SPINNER, HIDE_SPINNER, SHOW_ERROR, HIDE_ERROR, SET_MEDIA, SET_MEDIA_ORIENTATION, SELECTION, STEP, SHOW_ALERT, SHOW_CONFIRM } from "./actions";
+import { EDITAR_RELEVADOR, SHOW_SPINNER, HIDE_SPINNER, SHOW_ERROR, HIDE_ERROR, SET_MEDIA, SET_MEDIA_ORIENTATION, SELECTION, STEP, SHOW_ALERT, SHOW_CONFIRM, AGREGAR_RELEVADOR } from "./actions";
 
 const initialState = {
     spinner: {
@@ -18,6 +18,16 @@ const initialState = {
     menu: {
         timeStamp: null,
         option: "",
+    },
+
+    agregarRelevador: {
+        timestamp: null,
+        resultado: {},
+    },
+
+    editarRelevador: {
+        timestamp: null,
+        resultado: {},
     },
 
     alert: {
@@ -84,6 +94,14 @@ export const reducer = (state = initialState, action) => {
             break;
         case STEP:
             newState.steps.step = action.step;
+            break;
+        case EDITAR_RELEVADOR:
+            newState.editarRelevador.timestamp = new Date().getTime();
+            newState.editarRelevador.resultado = action.body;
+            break;
+        case AGREGAR_RELEVADOR:
+            newState.agregarRelevador.timestamp = new Date().getTime();
+            newState.agregarRelevador.resultado = action.body;
             break;
     }
     return newState;

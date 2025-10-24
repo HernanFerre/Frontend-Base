@@ -14,6 +14,7 @@ import { MiComponente } from "./componentes/miComponente";
 import { MisActividades } from "./componentes/misActividades";
 import { MisRelevadores } from "./componentes/misRelevadores";
 import { compEmpresas } from "./componentes/compEmpresas";
+import { editarRelevador } from "./componentes/editarRelevador";
 
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
@@ -70,6 +71,7 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
             <mi-componente></mi-componente>
             <mis-actividades></mis-actividades>
             <mis-relevadores></mis-relevadores>
+            <editar-relevador hidden></editar-relevador>
         `;
     }
 
