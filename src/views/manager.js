@@ -15,6 +15,7 @@ import { MisActividades } from "./componentes/misActividades";
 import { MisRelevadores } from "./componentes/misRelevadores";
 import { compEmpresas } from "./componentes/compEmpresas";
 import { editarRelevador } from "./componentes/editarRelevador";
+import { FiltroControl } from "./componentes/filtro";
 
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
@@ -66,6 +67,7 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
         return html`
             <div class="spinner" anillo fixed hidden></div>
             <menu-principal area="header"></menu-principal>
+            <filtro-control></filtro-control>
             <form-test></form-test>
             <comp-empresas></comp-empresas>
             <mi-componente></mi-componente>

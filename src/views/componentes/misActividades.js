@@ -21,9 +21,11 @@ const ACTIVIDADES_BY_ID = "actividad.byId.timeStamp";
 const ACTIVIDADES_UPDATE = "actividad.updateActividad.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
+const FILTRO = "ui.filtros.timeStamp";
 
 export class MisActividades extends connect(
     store,
+    FILTRO,
     ACTIVIDADES_DELETE,
     ACTIVIDADES_ADD,
     SCREEN,
@@ -39,6 +41,7 @@ export class MisActividades extends connect(
         this.item = {};
         this.itemByDescription = {};
         this.actividades = [];
+        this.actividadesBk = [];
         this.mediaSize = null;
         this.area = "body";
     }
@@ -60,6 +63,7 @@ export class MisActividades extends connect(
                 grid-gap: 0 !important;
                 grid-template-rows: auto 1fr;
                 place-self: center;
+
                 --ancho-descripcion: 40rem;
                 --ancho-boton: 3rem;
             }
@@ -89,6 +93,7 @@ export class MisActividades extends connect(
                 overflow-y: auto;
                 overflow-x: hidden;
                 gap: 0;
+                place-content: start;
             }
             .contenedor::-webkit-scrollbar {
                 width: 0.5rem;
@@ -305,6 +310,7 @@ export class MisActividades extends connect(
 
         if (name == ACTIVIDADES_ALL) {
             this.actividades = state.actividad.entities;
+            this.actividadesBk = [...this.actividades];
             this.update();
             if (this.actividadAddId != null) {
                 let div = this.shadowRoot.querySelector('*[ultimoid="' + this.actividadAddId + '"]');
@@ -319,6 +325,13 @@ export class MisActividades extends connect(
                 }, 750);
 
                 this.actividadAddId = null;
+            }
+        }
+        if (name == FILTRO) {
+            if (state.ui.filtros.texto != "") {
+                this.actividades = this.actividades.filter((a) => a.descripcion.toUpperCase().indexOf(state.ui.filtros.texto.toUpperCase()) != -1);
+            } else {
+                this.actividades = [...this.actividadesBk];
             }
         }
         if (name == ACTIVIDADES_BY_DESCRIPTION) {
@@ -365,6 +378,9 @@ export class MisActividades extends connect(
                 type: Object,
             },
             actividades: {
+                type: Array,
+            },
+            actividadesBk: {
                 type: Array,
             },
             mediaSize: {

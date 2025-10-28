@@ -23,6 +23,13 @@ export const EDITAR_RELEVADOR = "[ui] editar relevador";
 
 export const AGREGAR_RELEVADOR = "[ui] agregar relevador";
 
+export const FILTRAR = "[ui] filtrar";
+
+export const filtrar = (texto) => ({
+    type: FILTRAR,
+    texto: texto,
+});
+
 export const agregarRelevador = (body) => ({
     type: AGREGAR_RELEVADOR,
     body: body,
