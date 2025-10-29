@@ -9,7 +9,10 @@ import { gridLayout } from "@brunomon/template-lit/src/views/css/gridLayout";
 import { SEARCH, CANCEL, EQUIS } from "../../../assets/icons/svgs";
 import { filtrar } from "../../redux/ui/actions";
 
-export class FiltroControl extends connect(store)(LitElement) {
+const MEDIA_CHANGE = "ui.media.timeStamp";
+const SCREEN = "screen.timeStamp";
+
+export class FiltroControl extends connect(store, MEDIA_CHANGE, SCREEN)(LitElement) {
     constructor() {
         super();
         this.hidden = false;
@@ -27,16 +30,21 @@ export class FiltroControl extends connect(store)(LitElement) {
                 display: grid;
                 grid-auto-flow: column;
                 place-content: start;
+                justify-self: center;
+            }
+            .input {
+                padding: 0.5rem;
+            }
+            .button {
             }
         `;
     }
     render() {
         return html`
-            <div class="input">
-                <input @input="${this.filtrar}" class="grid center" id="texto" .value=${this.texto} />
+            <div class="input filtro">
+                <input placeholder="Escriba su busqueda aqui" @input="${this.filtrar}" class="grid center" id="texto" .value=${this.texto} />
             </div>
-            <button flat @click="${this.filtrar}">${SEARCH}</button>
-            <button flat @click="${this.limpiar}">${EQUIS}</button>
+            <button class="button" flat @click="${this.limpiar}">${EQUIS}</button>
         `;
     }
 
@@ -50,7 +58,17 @@ export class FiltroControl extends connect(store)(LitElement) {
         store.dispatch(filtrar(this.texto));
     }
 
-    stateChanged(state, name) {}
+    stateChanged(state, name) {
+        if (name == SCREEN || name == MEDIA_CHANGE) {
+            this.limpiar();
+            this.mediaSize = state.ui.media.size;
+            this.hidden = true;
+            const isCurrentScreen = ["Actividades", "Relevadores"].some((s) => s == state.screen.name);
+            if (isCurrentScreen) {
+                this.hidden = false;
+            }
+        }
+    }
 
     static get properties() {
         return {

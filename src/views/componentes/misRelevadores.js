@@ -17,8 +17,9 @@ const RELEVADOR_GET_ALL = "relevador.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
 const SCREEN = "screen.timeStamp";
 const EDITAR_RELEVADOR = "relevador.byId.timeStamp";
+const FILTRO = "ui.filtros.timeStamp";
 
-export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
+export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SCREEN, MEDIA_CHANGE)(LitElement) {
     constructor() {
         super();
         this.relevadorId = null;
@@ -26,6 +27,7 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
         this.item = {};
         this.itemByDescription = {};
         this.relevadores = [];
+        this.relevadoresBk = [];
         this.mediaSize = null;
         this.area = "body";
     }
@@ -82,6 +84,7 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                 background-color: var(--aplicacion);
                 padding: 0;
                 gap: 0.1rem;
+                place-content: start;
             }
             .contenedor::-webkit-scrollbar {
                 width: 0.5rem;
@@ -230,6 +233,7 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
 
         if (name == RELEVADOR_GET_ALL) {
             this.relevadores = state.relevador.entities;
+            this.relevadoresBk = [...this.relevadores];
             this.update();
             if (this.relevadorId != null) {
                 let div = this.shadowRoot.querySelector('*[ultimoid="' + this.relevadorId + '"]');
@@ -244,6 +248,16 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                 }, 750);
 
                 this.relevadorId = null;
+            }
+        }
+
+        if (name == FILTRO) {
+            if (!this.hidden) {
+                if (state.ui.filtros.texto != "") {
+                    this.relevadores = this.relevadoresBk.filter((a) => (a.apellido + " " + a.nombre + " " + a.email).toUpperCase().indexOf(state.ui.filtros.texto.toUpperCase()) != -1);
+                } else {
+                    this.relevadores = [...this.relevadoresBk];
+                }
             }
         }
     }
@@ -261,6 +275,9 @@ export class MisRelevadores extends connect(store, RELEVADOR_GET_ALL, SCREEN, ME
                 type: Object,
             },
             relevadores: {
+                type: Array,
+            },
+            relevadoresBk: {
                 type: Array,
             },
             mediaSize: {

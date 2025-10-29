@@ -328,10 +328,12 @@ export class MisActividades extends connect(
             }
         }
         if (name == FILTRO) {
-            if (state.ui.filtros.texto != "") {
-                this.actividades = this.actividades.filter((a) => a.descripcion.toUpperCase().indexOf(state.ui.filtros.texto.toUpperCase()) != -1);
-            } else {
-                this.actividades = [...this.actividadesBk];
+            if (!this.hidden) {
+                if (state.ui.filtros.texto != "") {
+                    this.actividades = this.actividadesBk.filter((a) => a.descripcion.toUpperCase().indexOf(state.ui.filtros.texto.toUpperCase()) != -1);
+                } else {
+                    this.actividades = [...this.actividadesBk];
+                }
             }
         }
         if (name == ACTIVIDADES_BY_DESCRIPTION) {
