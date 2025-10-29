@@ -36,6 +36,8 @@ export class FiltroControl extends connect(store, MEDIA_CHANGE, SCREEN)(LitEleme
                 padding: 0.5rem;
             }
             .button {
+                padding: 0 !important;
+                align-self: center;
             }
         `;
     }
