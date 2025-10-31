@@ -30,6 +30,7 @@ html {
     --on-formulario-separador: rgba(0, 0, 0, 0.12);
     --on-formulario-bajada: rgba(0, 0, 0, 0.6);
     --velo: rgba(0, 0, 0, 0.32);
+    --on-formulario-disable: rgba(0, 0, 0, 0.38);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +47,7 @@ html {
         --on-aplicacion-disabled: rgba(255, 255, 255, 0.38);
         --on-aplicacion-separador: rgba(255, 255, 255, 0.12);
         --on-aplicacion-bajada: rgba(255, 255, 255, 0.6);
+        --on-formulario-disable: rgba(255, 255, 255, 0.38);
 
         --error: #cf6679;
 
