@@ -28,13 +28,12 @@ export class FiltroControl extends connect(store, MEDIA_CHANGE, SCREEN)(LitEleme
             }
             :host {
                 display: grid;
-                grid-auto-flow: column;
-                place-content: start;
-                justify-self: center;
+                grid-template-columns: 1fr auto;
             }
             .input {
                 padding: 0.5rem;
             }
+
             .button {
                 padding: 0 !important;
                 align-self: center;

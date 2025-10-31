@@ -71,7 +71,7 @@ export class viewManager extends connect(store, MEDIA_CHANGE, SCREEN, SELECTION)
             <form-test></form-test>
             <comp-empresas></comp-empresas>
 
-            <div class="inner-grid row">
+            <div class="inner-grid row justify-self-center">
                 <filtro-control></filtro-control>
                 <mi-componente></mi-componente>
                 <mis-actividades></mis-actividades>
