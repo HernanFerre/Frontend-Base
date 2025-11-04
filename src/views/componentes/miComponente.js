@@ -52,6 +52,9 @@ export class MiComponente extends connect(store, ART_DELETE, MEDIA_CHANGE, SCREE
                 --ancho-descripcion: 40rem;
                 --ancho-boton: 3rem;
             }
+            :host([media-size="small"]) {
+                --ancho-descripcion: 22rem;
+            }
 
             :host([hidden]) {
                 display: none;
@@ -355,8 +358,10 @@ export class MiComponente extends connect(store, ART_DELETE, MEDIA_CHANGE, SCREE
             items: {
                 type: Array,
             },
-            mediaChange: {
+            mediaSize: {
                 type: String,
+                reflect: true,
+                attribute: "media-size",
             },
             area: {
                 type: String,

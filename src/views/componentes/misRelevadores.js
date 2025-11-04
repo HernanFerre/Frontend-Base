@@ -56,6 +56,48 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
                 --ancho-nombreusuario: 6rem;
                 --ancho-boton: 3rem;
             }
+            /* --- Layout responsive para móviles --- */
+            :host([media-size="small"]) .item {
+                display: grid;
+                grid-template-columns: auto;
+                padding: 0.6rem 0.8rem;
+                gap: 0.25rem;
+                border-radius: 0.4rem;
+                border: 1px solid var(--borde);
+                background: var(--formulario);
+                box-shadow: var(--shadow-elevation-1-box);
+                height: auto;
+            }
+
+            :host([media-size="small"]) .item > div {
+                font-size: 1.2rem;
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid var(--borde-claro);
+                width: 100%;
+                justify-self: stretch;
+            }
+            :host([media-size="small"]) .item > div:last-child {
+                border: none;
+            }
+
+            :host([media-size="small"]) .item > div::before {
+                content: attr(data-label) ": ";
+                font-weight: 600;
+                color: var(--primario);
+            }
+
+            :host([media-size="small"]) .item button {
+                justify-self: flex-start;
+                width: 3rem;
+                height: 3rem;
+                padding: 0.25rem;
+            }
+
+            :host([media-size="small"]) .contenedor {
+                display: grid;
+                justify-self: stretch;
+            }
 
             :host([hidden]) {
                 display: none;
@@ -177,11 +219,11 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
                 ${this.relevadores.map(
                     (relevador) =>
                         html` <div class="grid item" ultimoid="${relevador.id}" .relevador=${relevador} ?modificando=${relevador.modificando}>
-                            <div>${relevador.email}</div>
-                            <div>${relevador.nombre}</div>
-                            <div>${relevador.apellido}</div>
-                            <div>${relevador.departamento}</div>
-                            <div>${relevador.nombreDeUsuario}</div>
+                            <div data-label="Email">${relevador.email}</div>
+                            <div data-label="Nombre">${relevador.nombre}</div>
+                            <div data-label="Apellido">${relevador.apellido}</div>
+                            <div data-label="Departamento">${relevador.departamento}</div>
+                            <div data-label="Usuario">${relevador.nombreDeUsuario}</div>
                             <button
                                 flat
                                 @click="${(e) => {
@@ -224,6 +266,7 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
+            this.orientation = state.ui.media.orientation;
             this.hidden = true;
             const isCurrentScreen = ["Relevadores"].some((s) => s == state.screen.name);
             if (isInLayout(state, this.area) && isCurrentScreen) {
@@ -282,6 +325,12 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
             },
             mediaSize: {
                 type: String,
+                reflect: true,
+                attribute: "media-size",
+            },
+            orientation: {
+                type: String,
+                reflect: true,
             },
             area: {
                 type: String,
