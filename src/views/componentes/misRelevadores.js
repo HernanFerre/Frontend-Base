@@ -59,7 +59,8 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
             /* --- Layout responsive para móviles --- */
             :host([media-size="small"]) .item {
                 display: grid;
-                grid-template-columns: auto;
+                grid-template-columns: 1fr;
+                justify-content: stretch;
                 padding: 0.6rem 0.8rem;
                 gap: 0.25rem;
                 border-radius: 0.4rem;
@@ -67,6 +68,7 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
                 background: var(--formulario);
                 box-shadow: var(--shadow-elevation-1-box);
                 height: auto;
+                margin: 0;
             }
 
             :host([media-size="small"]) .item > div {
@@ -74,8 +76,7 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
                 display: flex;
                 justify-content: space-between;
                 border-bottom: 1px solid var(--borde-claro);
-                width: 100%;
-                justify-self: stretch;
+                width: 100%;!Important;
             }
             :host([media-size="small"]) .item > div:last-child {
                 border: none;
@@ -88,7 +89,7 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
             }
 
             :host([media-size="small"]) .item button {
-                justify-self: flex-start;
+                justify-self: center;
                 width: 3rem;
                 height: 3rem;
                 padding: 0.25rem;
@@ -126,7 +127,7 @@ export class MisRelevadores extends connect(store, FILTRO, RELEVADOR_GET_ALL, SC
                 background-color: var(--aplicacion);
                 padding: 0;
                 gap: 0.1rem;
-                place-content: start;
+                align-content: start;
             }
             .contenedor::-webkit-scrollbar {
                 width: 0.5rem;

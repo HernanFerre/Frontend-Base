@@ -55,6 +55,18 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
             :host[hidden] {
                 display: none;
             }
+            :host([media-size="small"]) {
+                font-size: 1.5rem;
+            }
+
+            :host([media-size="small"]) .items-valores {
+                grid-auto-flow: row;
+            }
+
+            :host([media-size="small"]) .items-fila {
+                grid-auto-flow: row;
+            }
+
             .main {
                 color: var(--on-formulario);
                 background-color: var(--formulario);
@@ -65,6 +77,16 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
                 width: 50vw;
                 justify-self: center;
                 align-self: center;
+            }
+
+            .botones {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grabar {
+                place-self: flex-end;
+            }
+            .cerrar {
+                place-self: flex-start;
             }
             .check {
                 margin: 1.5rem 0.5rem;
@@ -85,21 +107,22 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
                 justify-content: space-between;
             }
             .grabar-button {
-                width: fit-content;
+                place-self: center;
+
                 margin: 0 auto 1.5rem;
             }
             .items-fila {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: auto;
             }
             .items-fila2 {
                 grid-template-columns: 1fr 1fr auto auto;
             }
-            .btn-cabecera {
-                display: grid;
-                align-content: start;
-                justify-content: start;
+            .btn-cancelar {
+                place-self: center;
+
+                margin: 0 auto 1.5rem;
             }
-            .btn-cabecera svg {
+            .btn-cancelar svg {
                 fill: var(--primario);
             }
         `;
@@ -138,10 +161,14 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
                         <div class="inner-grid column items-fila2"></div>
                     </div>
                 </div>
-                <button class="grabar-button" @click="${this.guardar}" raised>Grabar</button>
-            </div>
-            <div>
-                <button class="btn-cabecera" @click="${this.volver}" link>${EQUIS}</button>
+                <div class="inner-grid botones">
+                    <div class="inner-grid grabar">
+                        <button class="grabar-button" @click="${this.guardar}" raised>Grabar</button>
+                    </div>
+                    <div class="inner-grid cerrar">
+                        <button class="btn-cancelar" @click="${this.volver}" link>CERRAR</button>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -205,6 +232,7 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
     stateChanged(state, name) {
         if (name == SCREEN || name == MEDIA_CHANGE) {
             this.mediaSize = state.ui.media.size;
+            this.orientation = state.ui.media.orientation;
         }
 
         if (name === AGREGAR_RELEVADOR) {
@@ -252,6 +280,15 @@ export class editarRelevador extends Validable(connect(store, AGREGAR_RELEVADOR,
             hidden: { type: Boolean, reflect: true },
             area: { type: String, reflect: true },
             modo: { type: String },
+            mediaSize: {
+                type: String,
+                reflect: true,
+                attribute: "media-size",
+            },
+            orientation: {
+                type: String,
+                reflect: true,
+            },
         };
     }
 }
