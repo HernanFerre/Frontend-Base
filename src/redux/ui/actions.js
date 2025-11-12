@@ -25,6 +25,19 @@ export const AGREGAR_RELEVADOR = "[ui] agregar relevador";
 
 export const FILTRAR = "[ui] filtrar";
 
+export const MOSTRAR_COMBO = "[ui] mostrar combo";
+export const OCULTAR_COMBO = "[ui] ocultar combo";
+
+export const mostrarCombo = (dato) => ({
+    type: MOSTRAR_COMBO,
+    dato: dato,
+});
+
+export const ocultarCombo = (dato) => ({
+    type: OCULTAR_COMBO,
+    dato: dato,
+});
+
 export const filtrar = (texto) => ({
     type: FILTRAR,
     texto: texto,

@@ -14,6 +14,8 @@ import {
     SHOW_ALERT,
     SHOW_CONFIRM,
     AGREGAR_RELEVADOR,
+    MOSTRAR_COMBO,
+    OCULTAR_COMBO,
 } from "./actions";
 
 const initialState = {
@@ -34,6 +36,15 @@ const initialState = {
         option: "",
     },
 
+    mostrarCombo: {
+        timeStamp: null,
+        dato: "",
+    },
+
+    ocultarCombo: {
+        timeStamp: null,
+        dato: "",
+    },
     agregarRelevador: {
         timestamp: null,
         resultado: {},
@@ -124,6 +135,14 @@ export const reducer = (state = initialState, action) => {
         case FILTRAR:
             newState.filtros.timeStamp = new Date().getTime();
             newState.filtros.texto = action.texto;
+            break;
+        case MOSTRAR_COMBO:
+            newState.mostrarCombo.timeStamp = new Date().getTime();
+            newState.mostrarCombo.dato = action.dato;
+            break;
+        case OCULTAR_COMBO:
+            newState.ocultarCombo.timeStamp = new Date().getTime();
+            newState.ocultarCombo.dato = action.dato;
             break;
     }
     return newState;

@@ -9,10 +9,9 @@ import { select } from "@brunomon/template-lit/src/views/css/select";
 import { check } from "@brunomon/template-lit/src/views/css/check";
 import { button } from "@brunomon/template-lit/src/views/css/button";
 import { isInLayout } from "../../redux/screens/screenLayouts";
-import { showAlert, showError, mostrarCombo, ocultarCombo } from "../../redux/ui/actions";
+import { showAlert, showError } from "../../redux/ui/actions";
 import { CANCELAR, CHECK, MAS, DELETE, EQUIS } from "../../../assets/icons/svgs";
 import { deleteEmpresa, getAllEmpresas, updateEmpresa, addEmpresa } from "../../redux/empresa/actions";
-import { ComboRelevadores } from "./comboRelevadores";
 
 const EMPRESAS_ALL = "empresa.all.timeStamp";
 const MEDIA_CHANGE = "ui.media.timeStamp";
@@ -43,10 +42,8 @@ export class Empresas extends connect(store, SCREEN, MEDIA_CHANGE, EMPRESAS_ALL)
                 border-radius: 0.5rem 0.5rem 0 0;
                 box-shadow: var(--shadow-elevation-3-box);
                 grid-gap: 0 !important;
-                margin-top: 2rem;
                 grid-template-rows: auto 1fr;
-                align-self: flex-start;
-                justify-self: center;
+                place-self: center;
                 --ancho-descripcion: 40rem;
                 --ancho-boton: 3rem;
             }
@@ -72,9 +69,9 @@ export class Empresas extends connect(store, SCREEN, MEDIA_CHANGE, EMPRESAS_ALL)
             }
             .contenedor {
                 color: var(--on-formulario);
-                /* grid-template-columns: 1fr */
-                height: auto;
-                overflow: visible;
+                height: 65vh;
+                overflow-y: auto;
+                overflow-x: hidden;
                 gap: 0;
             }
             .contenedor::-webkit-scrollbar {
@@ -135,20 +132,6 @@ export class Empresas extends connect(store, SCREEN, MEDIA_CHANGE, EMPRESAS_ALL)
             .item[nuevo] {
                 opacity: 0.3;
             }
-
-            #relevador-1,
-            #relevador-2 {
-                position: relative;
-            }
-
-            combo-relevadores {
-                position: absolute;
-                left: 0;
-                top: 100%;
-            }
-            .input {
-                grid-template-rows: auto 1fr;
-            }
         `;
     }
 
@@ -156,59 +139,60 @@ export class Empresas extends connect(store, SCREEN, MEDIA_CHANGE, EMPRESAS_ALL)
         return html`
             <div class="inner-grid cabecera column">
                 <div></div>
-                <div class="grid center"><h2>Formulario de Relevadores</h2></div>
-                <div class="grid end"></div>
+                <div class="grid center"><h2>Empresas</h2></div>
+                <div class="grid end">
+                    <button raised @click="${this.agregarOCancelar}" ?cancelar="${this.agregando == true || this.modificando == true}">${MAS}</button>
+                </div>
             </div>
 
-            <div class="contenedor grid">
-                <div class="grid item">
-                    <div class="input" id="relevador-1">
-                        <label for="relevador-1">RELEVADOR 1</label>
-                        <input
-                            placeholder="Escriba su busqueda aqui"
-                            @focus="${() => {
-                                store.dispatch(mostrarCombo("relevador1"));
-                            }}"
-                            @blur="${() => {
-                                this.ocultar("relevador1");
-                            }}"
-                            class="grid center"
-                            .value=${""}
-                        />
-
-                        <combo-relevadores id="relevador1"></combo-relevadores>
+            <div class="contenedor inner-grid">
+                <div class="grid item" id="ultimo" ?oculto="${!this.agregando}" ?modificando=${this.agregando}>
+                    <div class="input">
+                        <input class="grid center" ?oculto="${!this.agregando}" id="input-agregar" />
+                    </div>
+                    <button flat ?oculto="${this.agregando}" @click="${this.agregar}">${CHECK}</button>
+                </div>
+                <div class="grid item column">
+                    <div class="input filtro">
+                        <input placeholder="Escriba su busqueda aqui" @input="${""}" class="grid center" id="texto" .value=${""} />
                     </div>
                 </div>
-                <div class="grid item">
-                    <div class="input" id="relevador-2">
-                        <label for="relevador-2">RELEVADOR 2</label>
-                        <input
-                            placeholder="Escriba su busqueda aqui"
-                            @focus="${() => {
-                                store.dispatch(mostrarCombo("relevador2"));
-                            }}"
-                            @blur="${() => {
-                                this.ocultar("relevador2");
-                            }}"
-                            class="grid center"
-                            .value=${""}
-                        />
-
-                        <combo-relevadores id="relevador2"></combo-relevadores>
-                    </div>
-                </div>
+                <button class="button" flat @click="${""}">${EQUIS}</button>
+                ${this.empresasItems?.map(
+                    (empresa) =>
+                        html` <div class="grid item" ultimoid="${empresa.id}" .empresa=${empresa} ?modificando=${empresa.modificando}>
+                            <div class="input">
+                                <input
+                                    class="grid center input-descripcion"
+                                    .value="${empresa.descripcion}"
+                                    @input="${(e) => {
+                                        this.editando(e);
+                                    }}"
+                                />
+                            </div>
+                            <button
+                                flat
+                                ?oculto="${!empresa.modificando}"
+                                @click="${(e) => {
+                                    this.editar(e, empresa);
+                                }}"
+                            >
+                                ${CHECK}
+                            </button>
+                            <button
+                                class="eliminable"
+                                flat
+                                ?oculto="${!empresa.modificando}"
+                                @click="${(e) => {
+                                    this.eliminar(e, empresa);
+                                }}"
+                            >
+                                ${DELETE}
+                            </button>
+                        </div>`
+                )}
             </div>
         `;
-    }
-
-    mostrar(dato) {
-        store.dispatch(mostrarCombo(dato));
-    }
-
-    ocultar(dato) {
-        setTimeout(() => {
-            store.dispatch(ocultarCombo(dato));
-        }, 100);
     }
 
     agregarOCancelar() {
